@@ -96,6 +96,8 @@ void ACSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsLocallyControlled()) return;
+
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) 
 	{
