@@ -5,6 +5,7 @@
 #include "GA/AT/CSAT_ReverseGravityTrace.h"
 #include "GA/TA/CSTA_ReverseGravityTrace.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Components/StaticMeshComponent.h"
 #include "ChronoSpace.h"
 
 UCSGA_ReverseGravity::UCSGA_ReverseGravity()
@@ -29,15 +30,24 @@ void UCSGA_ReverseGravity::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
 		UE_LOG(LogCS, Log, TEXT("Target %s Detected"), *HitResult.GetActor()->GetName());
+		
+		UStaticMeshComponent* StaticMeshComp = Cast<UStaticMeshComponent>(HitResult.GetComponent());
 
-		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+		if (StaticMeshComp)
+		{
+			UE_LOG(LogCS, Log, TEXT("StaticMeshComp Found!"));
+			FVector ZForce(0.0f, 0.0f, 30000.0f);
+			StaticMeshComp->AddImpulse(ZForce);
+		}
+
+		/*UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
 
 		if (!SourceASC || !TargetASC)
 		{
 			UE_LOG(LogCS, Log, TEXT("ASC Not Found.."));
 			return;
-		}
+		}*/
 	}
 
 	bool bReplicatedEndAbility = true;
