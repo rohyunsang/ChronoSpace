@@ -24,22 +24,28 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	// Input
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/ThirdPerson/Input/IMC_Default.IMC_Default'"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
 	if (nullptr != InputMappingContextRef.Object)
 	{
 		MappingContext = InputMappingContextRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Move.IA_Move'"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	if (nullptr != InputActionShoulderMoveRef.Object)
 	{
 		ShoulderMoveAction = InputActionShoulderMoveRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/ThirdPerson/Input/Actions/IA_Look.IA_Look'"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
 	if (nullptr != InputActionShoulderLookRef.Object)
 	{
 		ShoulderLookAction = InputActionShoulderLookRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTestRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Test.IA_Test'"));
+	if (nullptr != InputActionTestRef.Object)
+	{
+		TestAction = InputActionTestRef.Object;
 	}
 
 	// ASC
@@ -61,7 +67,6 @@ void ACSCharacterPlayer::PossessedBy(AController* NewController)
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
 
-		int32 InputId = 0;
 		for (const auto& StartAbility : StartAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -74,8 +79,6 @@ void ACSCharacterPlayer::PossessedBy(AController* NewController)
 			StartSpec.InputID = StartInputAbility.Key;
 			ASC->GiveAbility(StartSpec);
 		}
-
-		SetupGASInputComponent();
 
 		/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
 		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
@@ -103,6 +106,8 @@ void ACSCharacterPlayer::BeginPlay()
 	{
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
+
+	SetupGASInputComponent();
 }
 
 void ACSCharacterPlayer::SetDead()
@@ -140,12 +145,21 @@ void ACSCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 void ACSCharacterPlayer::SetupGASInputComponent()
 {
+	UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Start"));
 	if (IsValid(ASC) && IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-		/*EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AABGASCharacterPlayer::GASInputPressed, 0);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AABGASCharacterPlayer::GASInputReleased, 0);
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AABGASCharacterPlayer::GASInputPressed, 1);*/
+		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, 0);
+		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, 0);
+		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
+	}
+	else if (!IsValid(ASC))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Invalid ASC"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Invalid InputComponent"));
 	}
 }
 
