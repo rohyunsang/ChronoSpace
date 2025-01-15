@@ -43,22 +43,25 @@ FGameplayAbilityTargetDataHandle ACSTA_ReverseGravityTrace::MakeTargetData() con
 	}
 	
 
-	FHitResult OutHitResult;
+	TArray< FHitResult > OutHitResults;
 	const float AttackRange = 50.0f;
 	const float AttackRaduis = 100.0f;
 
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(UABAT_Trace), false, Character);
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(UCSAT_ReverseGravityTrace), false, Character);
 	const FVector Forward = Character->GetActorForwardVector();
 	const FVector Start = Character->GetActorLocation() + Forward * Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + Forward * AttackRange;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_CSACTION, FCollisionShape::MakeSphere(AttackRaduis), Params);
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, FQuat::Identity, CCHANNEL_CSACTION, FCollisionShape::MakeSphere(AttackRaduis), Params);
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	if (HitDetected)
 	{
-		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
-		DataHandle.Add(TargetData);
+		for (auto OutHitResult : OutHitResults)
+		{
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
+			DataHandle.Add(TargetData);
+		}
 	}
 
 #if ENABLE_DRAW_DEBUG

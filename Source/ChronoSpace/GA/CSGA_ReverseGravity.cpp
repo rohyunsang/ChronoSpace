@@ -26,11 +26,12 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UCSGA_ReverseGravity::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
-	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
+	int32 idx = 0;
+	while (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, idx))
 	{
-		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
+		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, idx);
 		UE_LOG(LogCS, Log, TEXT("Target %s Detected"), *HitResult.GetActor()->GetName());
-		
+
 		UStaticMeshComponent* StaticMeshComp = Cast<UStaticMeshComponent>(HitResult.GetComponent());
 
 		if (StaticMeshComp)
@@ -39,15 +40,7 @@ void UCSGA_ReverseGravity::OnTraceResultCallback(const FGameplayAbilityTargetDat
 			FVector ZForce(0.0f, 0.0f, 30000.0f);
 			StaticMeshComp->AddImpulse(ZForce);
 		}
-
-		/*UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
-		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
-
-		if (!SourceASC || !TargetASC)
-		{
-			UE_LOG(LogCS, Log, TEXT("ASC Not Found.."));
-			return;
-		}*/
+		++idx;
 	}
 
 	bool bReplicatedEndAbility = true;
