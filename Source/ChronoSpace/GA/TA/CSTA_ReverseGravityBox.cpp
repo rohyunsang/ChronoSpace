@@ -15,10 +15,12 @@
 ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
 {
 	ReverseGravityTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("ReverseGravityTrigger"));
-	ReverseGravityTrigger->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
+    RootComponent = ReverseGravityTrigger;
+	ReverseGravityTrigger->SetBoxExtent(FVector(200.0f, 200.0f, 1000.0f));
 	ReverseGravityTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	ReverseGravityTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
 	ReverseGravityTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
+    ReverseGravityTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
 }
 
 void ACSTA_ReverseGravityBox::StartTargeting(UGameplayAbility* Ability)
@@ -29,7 +31,7 @@ void ACSTA_ReverseGravityBox::StartTargeting(UGameplayAbility* Ability)
 
 void ACSTA_ReverseGravityBox::ConfirmTargetingAndContinue()
 {
-	UE_LOG(LogCS, Log, TEXT("ConfirmTargetingAndContinue"));
+	//UE_LOG(LogCS, Log, TEXT("ConfirmTargetingAndContinue"));
 	if (SourceActor)
 	{
 		OnComplete.Broadcast();
@@ -60,20 +62,35 @@ void ACSTA_ReverseGravityBox::BeginPlay()
     }
 }
 
+void ACSTA_ReverseGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    for (auto Act = ActorsThatIsReveredGravity.CreateIterator(); Act; ++Act)
+    {
+        if (!IsValid(Act.Value())) continue;
+        
+        ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
+        if (RemainedCharacter)
+        {
+            UCharacterMovementComponent* MovementComp = RemainedCharacter->GetCharacterMovement();
+            if (!MovementComp) continue;
+            if (MovementComp->GravityScale > 0) continue;
+                
+            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
+            MovementComp->GravityScale *= -1.0f;
+        }
+        
+        ActorsThatIsReveredGravity.FindAndRemoveChecked(Act.Value()->GetFName());
+    }
+    Super::EndPlay(EndPlayReason);
+}
+
+
 void ACSTA_ReverseGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
-	UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap: %s is detected"), *OtherActor->GetName());
-    //APawn* DetectedPawn = Cast<APawn>(OtherActor);
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
 
-    /*if (DetectedPawn)
-    {
-        UE_LOG(LogCS, Log, TEXT("%s is Pawn"), *OtherActor->GetName());
-    }*/
     if (DetectedCharacter)
     {
-        UE_LOG(LogCS, Log, TEXT("%s is Character"), *OtherActor->GetName());
-
         UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
         if (MovementComp)
         {
@@ -81,9 +98,32 @@ void ACSTA_ReverseGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* Overlap
             {
                 return;
             }
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 1.0f));
+            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= -1.0f;
-            UE_LOG(LogCS, Log, TEXT("Gravity scale changed to: %f"), MovementComp->GravityScale);
+            
+            ActorsThatIsReveredGravity.Emplace(OtherActor->GetFName(), OtherActor);
+        }
+    }
+}
+
+void ACSTA_ReverseGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+    //UE_LOG(LogCS, Log, TEXT("OnTriggerEndOverlap called: %s"), *OtherActor->GetName());
+    ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
+    if (DetectedCharacter)
+    {
+        UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
+        if (MovementComp)
+        {
+            if (MovementComp->GravityScale > 0)
+            {
+                return;
+            }
+
+            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
+            MovementComp->GravityScale *= -1.0f;
+
+            ActorsThatIsReveredGravity.FindAndRemoveChecked(OtherActor->GetFName());
         }
     }
 }

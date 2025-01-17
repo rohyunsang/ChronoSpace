@@ -19,7 +19,7 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	UE_LOG(LogCS, Log, TEXT("Begin"));
+	//UE_LOG(LogCS, Log, TEXT("Begin"));
 	
 	ActivateTasks();
 }
@@ -27,6 +27,7 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 void UCSGA_ReverseGravity::ActivateTasks()
 {
 	UCSAT_ReverseGravityBox* BoxTask = UCSAT_ReverseGravityBox::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
+	BoxTask->SetDurtionTime(1.0f);
 	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTasks);
 	BoxTask->ReadyForActivation();
 }
