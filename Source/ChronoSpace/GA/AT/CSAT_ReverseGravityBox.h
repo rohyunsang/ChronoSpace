@@ -25,6 +25,8 @@ public:
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
 
+	FORCEINLINE void SetDurtionTime(float InDurtionTime) { DurationTime = InDurtionTime; }
+
 	void SpawnAndInitializeTargetActor();
 	void FinalizeTargetActor();
 
@@ -44,4 +46,6 @@ protected:
 	TObjectPtr<class ACSTA_ReverseGravityBox> SpawnedTargetActor;
 
 	FTimerHandle EndTimer; 
+
+	float DurationTime = 1.0f;
 };

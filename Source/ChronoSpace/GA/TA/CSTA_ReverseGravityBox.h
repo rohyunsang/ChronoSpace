@@ -19,11 +19,17 @@ class CHRONOSPACE_API ACSTA_ReverseGravityBox : public AGameplayAbilityTargetAct
 public:
 	ACSTA_ReverseGravityBox();
 
+	virtual void BeginPlay() override;
+
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 	virtual void ConfirmTargetingAndContinue() override;
 
+	FORCEINLINE void SetDurationTime(float InDurationTime) { DurtionTime = InDurationTime; }
+
 	FTatgetActorDelegate OnComplete;
+
+	
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Stage, Meta = (AllowPrivateAccess = "true"))
@@ -31,4 +37,8 @@ protected:
 
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
+
+	TObjectPtr<class UBoxComponent> ReverseGravityTrigger;
+
+	float DurtionTime = 1.0f;
 };
