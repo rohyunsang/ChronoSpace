@@ -168,6 +168,8 @@ void ACSCharacterPlayer::GASInputPressed(int32 InputId)
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
+		if (Spec->InputPressed) return;
+
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{

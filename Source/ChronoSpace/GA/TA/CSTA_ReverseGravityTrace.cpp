@@ -42,7 +42,6 @@ FGameplayAbilityTargetDataHandle ACSTA_ReverseGravityTrace::MakeTargetData() con
 		return FGameplayAbilityTargetDataHandle();
 	}
 	
-
 	TArray< FHitResult > OutHitResults;
 	const float AttackRange = 50.0f;
 	const float AttackRaduis = 100.0f;
@@ -57,7 +56,7 @@ FGameplayAbilityTargetDataHandle ACSTA_ReverseGravityTrace::MakeTargetData() con
 	FGameplayAbilityTargetDataHandle DataHandle;
 	if (HitDetected)
 	{
-		for (auto OutHitResult : OutHitResults)
+		for (const auto OutHitResult : OutHitResults)
 		{
 			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
 			DataHandle.Add(TargetData);

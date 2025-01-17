@@ -13,6 +13,7 @@ UCSAT_ReverseGravityTrace* UCSAT_ReverseGravityTrace::CreateTask(UGameplayAbilit
 {
 	UCSAT_ReverseGravityTrace* NewTask = NewAbilityTask<UCSAT_ReverseGravityTrace>(OwningAbility);
 	NewTask->TargetActorClass = TargetActorClass;
+
 	return NewTask;
 }
 

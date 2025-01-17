@@ -2,10 +2,12 @@
 
 
 #include "GA/CSGA_ReverseGravity.h"
-#include "GA/AT/CSAT_ReverseGravityTrace.h"
-#include "GA/TA/CSTA_ReverseGravityTrace.h"
+#include "GA/AT/CSAT_ReverseGravityBox.h"
+#include "GA/TA/CSTA_ReverseGravityBox.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 #include "ChronoSpace.h"
 
 UCSGA_ReverseGravity::UCSGA_ReverseGravity()
@@ -18,31 +20,20 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	UE_LOG(LogCS, Log, TEXT("Begin"));
-
-	UCSAT_ReverseGravityTrace* AttackTraceTask = UCSAT_ReverseGravityTrace::CreateTask(this, ACSTA_ReverseGravityTrace::StaticClass());
-	AttackTraceTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::OnTraceResultCallback);
-	AttackTraceTask->ReadyForActivation();
+	
+	ActivateTasks();
 }
 
-void UCSGA_ReverseGravity::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
+void UCSGA_ReverseGravity::ActivateTasks()
 {
-	int32 idx = 0;
-	while (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, idx))
-	{
-		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, idx);
-		UE_LOG(LogCS, Log, TEXT("Target %s Detected"), *HitResult.GetActor()->GetName());
+	UCSAT_ReverseGravityBox* BoxTask = UCSAT_ReverseGravityBox::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
+	//StopActivateTasks();
+	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTasks);
+	BoxTask->ReadyForActivation();
+}
 
-		UStaticMeshComponent* StaticMeshComp = Cast<UStaticMeshComponent>(HitResult.GetComponent());
-
-		if (StaticMeshComp)
-		{
-			UE_LOG(LogCS, Log, TEXT("StaticMeshComp Found!"));
-			FVector ZForce(0.0f, 0.0f, 30000.0f);
-			StaticMeshComp->AddImpulse(ZForce);
-		}
-		++idx;
-	}
-
+void UCSGA_ReverseGravity::StopActivateTasks()
+{
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);

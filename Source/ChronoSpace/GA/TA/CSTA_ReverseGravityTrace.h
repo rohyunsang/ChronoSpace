@@ -27,4 +27,5 @@ protected:
 	virtual FGameplayAbilityTargetDataHandle MakeTargetData() const;
 
 	bool bShowDebug = false;
-};
+}; 
+ 
