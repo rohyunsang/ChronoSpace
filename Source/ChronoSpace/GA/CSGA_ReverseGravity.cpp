@@ -21,18 +21,18 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 	//UE_LOG(LogCS, Log, TEXT("Begin"));
 	
-	ActivateTasks();
+	ActivateTask();
 }
 
-void UCSGA_ReverseGravity::ActivateTasks()
+void UCSGA_ReverseGravity::ActivateTask()
 {
 	UCSAT_ReverseGravityBox* BoxTask = UCSAT_ReverseGravityBox::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
 	BoxTask->SetDurtionTime(1.0f);
-	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTasks);
+	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTask);
 	BoxTask->ReadyForActivation();
 }
 
-void UCSGA_ReverseGravity::StopActivateTasks()
+void UCSGA_ReverseGravity::StopActivateTask()
 {
 	bool bReplicatedEndAbility = true;
 	bool bWasCancelled = false;

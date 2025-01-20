@@ -23,8 +23,8 @@ protected:
 	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);*/
 
 private:
-	void ActivateTasks();
+	void ActivateTask();
 
 	UFUNCTION()
-	void StopActivateTasks();
+	void StopActivateTask();
 };
