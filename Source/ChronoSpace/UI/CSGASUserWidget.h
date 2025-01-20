@@ -3,27 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerState.h"
+#include "Blueprint/UserWidget.h"
 #include "AbilitySystemInterface.h"
-#include "CSPlayerState.generated.h"
+#include "CSGASUserWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHRONOSPACE_API ACSPlayerState : public APlayerState, public IAbilitySystemInterface
+class CHRONOSPACE_API UCSGASUserWidget : public UUserWidget, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 	
-public:
-	ACSPlayerState();
 
+public:
+	virtual void SetAbilitySystemComponent(AActor* InOwner);
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
 
-	UPROPERTY()
-	TObjectPtr<class UCSAttributeSet> AttributeSet;
 };
