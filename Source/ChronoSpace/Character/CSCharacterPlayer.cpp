@@ -10,6 +10,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "UI/CSGASWidgetComponent.h"
+#include "UI/CSGASUserWidget.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
@@ -46,6 +48,28 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	if (nullptr != InputActionTestRef.Object)
 	{
 		TestAction = InputActionTestRef.Object;
+	}
+
+	// UI 
+	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
+	EnergyBar->SetupAttachment(GetMesh());
+	EnergyBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	//static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/Blueprint/BP_EnergyBar.BP_EnergyBar_C"));
+	if (EnergyBarWidgetRef.Class)
+	{
+		EnergyBar->SetWidgetClass(EnergyBarWidgetRef.Class);
+		EnergyBar->SetWidgetSpace(EWidgetSpace::Screen);
+		EnergyBar->SetDrawSize(FVector2D(200.0f, 20.f));
+		EnergyBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (EnergyBar)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("EnergyBar is valid and configured."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("EnergyBar is not valid!"));
+		}
 	}
 
 	// ASC

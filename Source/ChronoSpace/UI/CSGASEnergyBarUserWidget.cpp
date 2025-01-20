@@ -16,11 +16,14 @@ void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 
 	if (ASC)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ASC is not null!"));
+
 		ASC->GetGameplayAttributeValueChangeDelegate(UCSAttributeSet::GetEnergyAttribute()).AddUObject(this, &UCSGASEnergyBarUserWidget::OnEnergyChanged);
 		ASC->GetGameplayAttributeValueChangeDelegate(UCSAttributeSet::GetMaxEnergyAttribute()).AddUObject(this, &UCSGASEnergyBarUserWidget::OnMaxEnergyChanged);
 		PbEnergyBar->SetFillColorAndOpacity(EnergyColor);
-
+		
 		const UCSAttributeSet* CurrentAttributeSet = ASC->GetSet<UCSAttributeSet>();
+		
 		if (CurrentAttributeSet)
 		{
 			CurrentEnergy = CurrentAttributeSet->GetEnergy();
@@ -30,7 +33,19 @@ void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 			{
 				UpdateEnergyBar();
 			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("CurrentMaxEnergy is 0"));
+			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentAttributeSet is null!"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASC is null! Ensure that the Ability System Component is properly initialized before calling this function."));
 	}
 }
 
@@ -56,6 +71,6 @@ void UCSGASEnergyBarUserWidget::UpdateEnergyBar()
 
 	if (TxtEnergyStat)
 	{
-		TxtEnergyStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentEnergy, CurrentMaxEnergy)));
+		TxtEnergyStat->SetText(FText::FromString(FString::Printf(TEXT("%.0f/%0.f"), CurrentEnergy , CurrentMaxEnergy)));
 	}
 }

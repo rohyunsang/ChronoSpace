@@ -20,7 +20,6 @@ protected:
 
 	virtual void OnEnergyChanged(const FOnAttributeChangeData& ChangeData);
 	virtual void OnMaxEnergyChanged(const FOnAttributeChangeData& ChangeData);
-	virtual void OnInvinsibleTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 	void UpdateEnergyBar();
 
