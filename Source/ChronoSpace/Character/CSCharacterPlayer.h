@@ -8,6 +8,13 @@
 #include "InputActionValue.h"
 #include "CSCharacterPlayer.generated.h"
 
+UENUM()
+enum class EAbilityIndex : uint8
+{
+	ReverseGravity = 0,
+	BlackHole = 1
+};
+
 /**
  * 
  */
@@ -51,7 +58,7 @@ protected:
 	TObjectPtr<class UInputAction> ShoulderLookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> TestAction;
+	TObjectPtr<class UInputAction> ReverseGravityAction;
 
 // ASC Section
 protected:

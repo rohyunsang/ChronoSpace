@@ -44,10 +44,10 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		ShoulderLookAction = InputActionShoulderLookRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTestRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Test.IA_Test'"));
-	if (nullptr != InputActionTestRef.Object)
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReverseGravityRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ReverseGravity.IA_ReverseGravity'"));
+	if (nullptr != InputActionReverseGravityRef.Object)
 	{
-		TestAction = InputActionTestRef.Object;
+		ReverseGravityAction = InputActionReverseGravityRef.Object;
 	}
 
 	// UI 
@@ -55,7 +55,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	EnergyBar->SetupAttachment(GetMesh());
 	EnergyBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
 	//static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
-	static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/Blueprint/BP_EnergyBar.BP_EnergyBar_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/Blueprint/UI/BP_EnergyBar.BP_EnergyBar_C"));
 	if (EnergyBarWidgetRef.Class)
 	{
 		EnergyBar->SetWidgetClass(EnergyBarWidgetRef.Class);
@@ -173,8 +173,8 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 	if (IsValid(ASC) && IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, 0);
-		EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, 0);
+		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
+		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
 	else if (!IsValid(ASC))
