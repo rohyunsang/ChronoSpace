@@ -49,5 +49,8 @@ protected:
 	UPROPERTY()
 	TMap<FName, TObjectPtr<AActor> > ActorsThatIsReveredGravity;
 
+	UPROPERTY()
+	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
+
 	float DurtionTime = 1.0f;
 };

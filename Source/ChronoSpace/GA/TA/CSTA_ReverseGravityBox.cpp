@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Physics/CSCollision.h"
@@ -14,6 +15,7 @@
 
 ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
 {
+    // Trigger
 	ReverseGravityTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("ReverseGravityTrigger"));
     RootComponent = ReverseGravityTrigger;
 	ReverseGravityTrigger->SetBoxExtent(FVector(200.0f, 200.0f, 1000.0f));
@@ -21,6 +23,27 @@ ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
 	ReverseGravityTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
 	ReverseGravityTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
     ReverseGravityTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
+
+    // Static Mesh
+    StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+    StaticMeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
+    StaticMeshComp->SetupAttachment(ReverseGravityTrigger);
+    StaticMeshComp->SetRelativeLocation(FVector(-0.0f, -0.0f, -0.0f));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/SM_Cube.SM_Cube'"));
+    if (nullptr != StaticMeshRef.Object)
+    {
+        StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
+    }
+
+    FVector BoxExtent = ReverseGravityTrigger->GetScaledBoxExtent();
+    FVector MeshScale = BoxExtent / 50.0f; // SM_Cube 기본 사이즈가 100x100x100
+    StaticMeshComp->SetRelativeScale3D(MeshScale); 
+
+    static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialRef(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Material/MAT_AntyGravity_Inst.MAT_AntyGravity_Inst'"));
+    if (nullptr != MaterialRef.Object)
+    {
+        StaticMeshComp->SetMaterial(0, MaterialRef.Object);
+    }
 }
 
 void ACSTA_ReverseGravityBox::StartTargeting(UGameplayAbility* Ability)
