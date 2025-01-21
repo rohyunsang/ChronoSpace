@@ -20,7 +20,7 @@ public:
 	UCSAT_DurationTask();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "ReverseGravity", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UCSAT_DurationTask* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSDurationBasedTargetActor> TargetActorClass);
+	static UCSAT_DurationTask* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_DurationBase> TargetActorClass);
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
@@ -40,10 +40,10 @@ protected:
 	void OnTargetActorReadyCallback();
 
 	UPROPERTY()
-	TSubclassOf<class ACSDurationBasedTargetActor> TargetActorClass;
+	TSubclassOf<class ACSTA_DurationBase> TargetActorClass;
 
 	UPROPERTY()
-	TObjectPtr<class ACSDurationBasedTargetActor> SpawnedTargetActor;
+	TObjectPtr<class ACSTA_DurationBase> SpawnedTargetActor;
 
 	FTimerHandle EndTimer; 
 

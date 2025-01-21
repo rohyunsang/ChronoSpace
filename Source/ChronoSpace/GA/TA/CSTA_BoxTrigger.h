@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GA/TA/CSDurationBasedTargetActor.h"
+#include "GA/TA/CSTA_DurationBase.h"
 #include "CSTA_BoxTrigger.generated.h"
 
 
@@ -12,7 +12,7 @@
  * 
  */
 UCLASS()
-class CHRONOSPACE_API ACSTA_BoxTrigger : public ACSDurationBasedTargetActor
+class CHRONOSPACE_API ACSTA_BoxTrigger : public ACSTA_DurationBase
 {
 	GENERATED_BODY()
 	

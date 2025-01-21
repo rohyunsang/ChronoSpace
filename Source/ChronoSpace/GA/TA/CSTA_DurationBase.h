@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
-#include "CSDurationBasedTargetActor.generated.h"
+#include "CSTA_DurationBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTatgetActorEndedDelegate);
 
@@ -12,12 +12,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTatgetActorEndedDelegate);
  * 
  */
 UCLASS()
-class CHRONOSPACE_API ACSDurationBasedTargetActor : public AGameplayAbilityTargetActor
+class CHRONOSPACE_API ACSTA_DurationBase : public AGameplayAbilityTargetActor
 {
 	GENERATED_BODY()
 	
 public:
-	ACSDurationBasedTargetActor();
+	ACSTA_DurationBase();
 
 	FTatgetActorEndedDelegate OnComplete;
 };
