@@ -2,7 +2,7 @@
 
 
 #include "GA/CSGA_ReverseGravity.h"
-#include "GA/AT/CSAT_ReverseGravityBox.h"
+#include "GA/AT/CSAT_DurationTask.h"
 #include "GA/TA/CSTA_ReverseGravityBox.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Components/StaticMeshComponent.h"
@@ -26,7 +26,7 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UCSGA_ReverseGravity::ActivateTask()
 {
-	UCSAT_ReverseGravityBox* BoxTask = UCSAT_ReverseGravityBox::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
+	UCSAT_DurationTask* BoxTask = UCSAT_DurationTask::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
 	BoxTask->SetDurtionTime(1.0f);
 	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTask);
 	BoxTask->ReadyForActivation();

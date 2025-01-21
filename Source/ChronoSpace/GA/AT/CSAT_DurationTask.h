@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "CSAT_ReverseGravityBox.generated.h"
+#include "CSAT_DurationTask.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReverseGravityEndDelegate);
 
@@ -12,15 +12,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReverseGravityEndDelegate);
  * 
  */
 UCLASS()
-class CHRONOSPACE_API UCSAT_ReverseGravityBox : public UAbilityTask
+class CHRONOSPACE_API UCSAT_DurationTask : public UAbilityTask
 {
 	GENERATED_BODY()
 	
 public:
-	UCSAT_ReverseGravityBox();
+	UCSAT_DurationTask();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "ReverseGravity", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UCSAT_ReverseGravityBox* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_ReverseGravityBox> TargetActorClass);
+	static UCSAT_DurationTask* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class AGameplayAbilityTargetActor> TargetActorClass);
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
