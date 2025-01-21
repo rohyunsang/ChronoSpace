@@ -4,14 +4,14 @@
 #include "GA/AT/CSAT_DurationTask.h"
 #include "GA/TA/CSTA_ReverseGravityBox.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/GameplayAbilityTargetActor.h"
+#include "GA/TA/CSDurationBasedTargetActor.h"
 #include "ChronoSpace.h"
 
 UCSAT_DurationTask::UCSAT_DurationTask()
 {
 }
 
-UCSAT_DurationTask* UCSAT_DurationTask::CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AGameplayAbilityTargetActor> TargetActorClass)
+UCSAT_DurationTask* UCSAT_DurationTask::CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<ACSDurationBasedTargetActor> TargetActorClass)
 {
 	UCSAT_DurationTask* NewTask = NewAbilityTask<UCSAT_DurationTask>(OwningAbility);
 	NewTask->TargetActorClass = TargetActorClass;
@@ -43,7 +43,6 @@ void UCSAT_DurationTask::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ACSTA_ReverseGravityBox>(GetWorld()->SpawnActorDeferred<ACSTA_ReverseGravityBox>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
-		SpawnedTargetActor->SetDurationTime(DurationTime);
 		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_DurationTask::OnTargetActorReadyCallback);
 	}
 }

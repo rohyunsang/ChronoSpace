@@ -27,7 +27,7 @@ void UCSGA_ReverseGravity::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 void UCSGA_ReverseGravity::ActivateTask()
 {
 	UCSAT_DurationTask* BoxTask = UCSAT_DurationTask::CreateTask(this, ACSTA_ReverseGravityBox::StaticClass());
-	BoxTask->SetDurtionTime(1.0f);
+	BoxTask->SetDurtionTime( DurationTime );
 	BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTask);
 	BoxTask->ReadyForActivation();
 }

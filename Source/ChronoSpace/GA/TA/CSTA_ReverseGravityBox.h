@@ -23,8 +23,6 @@ public:
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 	virtual void ConfirmTargetingAndContinue() override;
-
-	FORCEINLINE void SetDurationTime(float InDurationTime) { DurtionTime = InDurationTime; }
 	
 protected:
 	UFUNCTION()

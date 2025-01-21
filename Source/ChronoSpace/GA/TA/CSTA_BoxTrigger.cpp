@@ -62,7 +62,7 @@ void ACSTA_BoxTrigger::BeginPlay()
             BoxRotation,
             FColor::Green,
             false,  // 지속 표시
-            DurtionTime, // -1은 시간 제한 없음
+            1,
             0,     // 디버그 선 우선순위
             2.0f   // 선 두께
         );

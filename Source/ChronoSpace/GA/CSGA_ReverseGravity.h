@@ -18,13 +18,15 @@ public:
 	UCSGA_ReverseGravity();
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-protected:
-	/*UFUNCTION()
-	void OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle);*/
+	FORCEINLINE const float GetDurationTime() const { return DurationTime; }
+	FORCEINLINE void SetDurationTime(float InDuarionTime) { DurationTime = InDuarionTime; }
 
 private:
 	void ActivateTask();
 
 	UFUNCTION()
 	void StopActivateTask();
+
+	UPROPERTY(EditAnywhere, Category = "Duration")
+	float DurationTime = 1.0f;
 };
