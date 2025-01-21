@@ -7,55 +7,20 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/StaticMeshComponent.h"
-#include "AbilitySystemBlueprintLibrary.h"
 #include "Components/BoxComponent.h"
-#include "Physics/CSCollision.h"
 #include "ChronoSpace.h"
 
 ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
 {
+    bShowDebug = false;
+
     // Trigger
-	ReverseGravityTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("ReverseGravityTrigger"));
-    RootComponent = ReverseGravityTrigger;
-	ReverseGravityTrigger->SetBoxExtent(FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize));
-	ReverseGravityTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	ReverseGravityTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
-	ReverseGravityTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
-    ReverseGravityTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
-
-    // Static Mesh
-    StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
-    StaticMeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
-    StaticMeshComp->SetupAttachment(ReverseGravityTrigger);
-
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/SM_Cube.SM_Cube'"));
-    if (nullptr != StaticMeshRef.Object)
-    {
-        StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
-    }
-
-    FVector BoxExtent = FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize);
-    float HalfSizeOfSide = 50.0f; // SM_Cube 기본 사이즈가 100x100x100 -> 반경(Extent) 기준 50
-    FVector LocationOffset = FVector(-HalfSizeOfSide, -HalfSizeOfSide, -HalfSizeOfSide);
-    FVector MeshScale = BoxExtent / HalfSizeOfSide;
-
-    StaticMeshComp->SetRelativeLocation(LocationOffset * MeshScale);
-    StaticMeshComp->SetRelativeScale3D(MeshScale);
+	BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
+    BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
 
     static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_AntyGravity.MAT_AntyGravity'"));
     
-    if ( MaterialRef.Succeeded() )
-    {
-        UMaterialInstanceDynamic* DynMaterial = UMaterialInstanceDynamic::Create(MaterialRef.Object, this);
-        if (DynMaterial)
-        {
-            float OutBaseValue = 2.0f;
-            DynMaterial->GetScalarParameterValue(FName(TEXT("Tiling")), OutBaseValue);
-            DynMaterial->SetScalarParameterValue(FName(TEXT("Tiling")), OutBaseValue * MeshScale.X);
-            StaticMeshComp->SetMaterial(0, DynMaterial);
-        }
-    }
+    SetSteticMeshMaterial(MaterialRef.Object, MeshScale.X);
 }
 
 void ACSTA_ReverseGravityBox::StartTargeting(UGameplayAbility* Ability)
@@ -73,33 +38,9 @@ void ACSTA_ReverseGravityBox::ConfirmTargetingAndContinue()
 	}
 }
 
-void ACSTA_ReverseGravityBox::BeginPlay()
-{
-    Super::BeginPlay();
-
-    if (ReverseGravityTrigger)
-    {
-        FVector BoxLocation = ReverseGravityTrigger->GetComponentLocation();
-        FVector BoxExtent = ReverseGravityTrigger->GetScaledBoxExtent(); // 스케일이 적용된 박스 크기
-        FQuat   BoxRotation = ReverseGravityTrigger->GetComponentRotation().Quaternion();
-
-        //DrawDebugBox(
-        //    GetWorld(),
-        //    BoxLocation,
-        //    BoxExtent,
-        //    BoxRotation,
-        //    FColor::Green,
-        //    false,  // 지속 표시
-        //    DurtionTime, // -1은 시간 제한 없음
-        //    0,     // 디버그 선 우선순위
-        //    2.0f   // 선 두께
-        //);
-    }
-}
-
 void ACSTA_ReverseGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    for (auto Act = ActorsThatIsReveredGravity.CreateIterator(); Act; ++Act)
+    for (auto Act = ActorsInBoxTrigger.CreateIterator(); Act; ++Act)
     {
         if (!IsValid(Act.Value())) continue;
         
@@ -114,7 +55,7 @@ void ACSTA_ReverseGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
             MovementComp->GravityScale *= -1.0f;
         }
         
-        ActorsThatIsReveredGravity.FindAndRemoveChecked(Act.Value()->GetFName());
+        ActorsInBoxTrigger.FindAndRemoveChecked(Act.Value()->GetFName());
     }
     Super::EndPlay(EndPlayReason);
 }
@@ -136,7 +77,7 @@ void ACSTA_ReverseGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* Overlap
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= -1.0f;
             
-            ActorsThatIsReveredGravity.Emplace(OtherActor->GetFName(), OtherActor);
+            ActorsInBoxTrigger.Emplace(OtherActor->GetFName(), OtherActor);
         }
     }
 }
@@ -158,7 +99,7 @@ void ACSTA_ReverseGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlappe
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= -1.0f;
 
-            ActorsThatIsReveredGravity.FindAndRemoveChecked(OtherActor->GetFName());
+            ActorsInBoxTrigger.FindAndRemoveChecked(OtherActor->GetFName());
         }
     }
 }

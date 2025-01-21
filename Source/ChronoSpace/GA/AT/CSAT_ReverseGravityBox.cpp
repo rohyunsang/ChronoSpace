@@ -39,16 +39,11 @@ void UCSAT_ReverseGravityBox::OnDestroy(bool AbilityEnded)
 
 void UCSAT_ReverseGravityBox::SpawnAndInitializeTargetActor()
 {
-	//UE_LOG(LogCS, Log, TEXT("SpawnAndInitializeTargetActor"));
 	SpawnedTargetActor = Cast<ACSTA_ReverseGravityBox>(GetWorld()->SpawnActorDeferred<ACSTA_ReverseGravityBox>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
 		SpawnedTargetActor->SetDurationTime(DurationTime);
 		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_ReverseGravityBox::OnTargetActorReadyCallback);
-	}
-	else
-	{
-		UE_LOG(LogCS, Log, TEXT("Not Spawned SpawnedTargetActor"));
 	}
 }
 
@@ -82,7 +77,6 @@ void UCSAT_ReverseGravityBox::EndTargetActor()
 
 void UCSAT_ReverseGravityBox::OnTargetActorReadyCallback()
 {
-	//UE_LOG(LogCS, Log, TEXT("OnTargetActorReadyCallback Called"));
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		OnComplete.Broadcast();
