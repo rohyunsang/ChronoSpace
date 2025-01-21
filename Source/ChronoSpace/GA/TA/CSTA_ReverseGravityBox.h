@@ -52,5 +52,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 
+	UPROPERTY(EditAnywhere, Category = "Box")
+	float BoxExtentSize = 200.0f;
+
 	float DurtionTime = 1.0f;
 };

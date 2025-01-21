@@ -18,7 +18,7 @@ ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
     // Trigger
 	ReverseGravityTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("ReverseGravityTrigger"));
     RootComponent = ReverseGravityTrigger;
-	ReverseGravityTrigger->SetBoxExtent(FVector(200.0f, 200.0f, 1000.0f));
+	ReverseGravityTrigger->SetBoxExtent(FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize));
 	ReverseGravityTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	ReverseGravityTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
 	ReverseGravityTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
@@ -28,21 +28,33 @@ ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
     StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
     StaticMeshComp->SetCollisionEnabled( ECollisionEnabled::NoCollision );
     StaticMeshComp->SetupAttachment(ReverseGravityTrigger);
-    StaticMeshComp->SetRelativeLocation(FVector(-0.0f, -0.0f, -0.0f));
+
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/SM_Cube.SM_Cube'"));
     if (nullptr != StaticMeshRef.Object)
     {
         StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
     }
 
-    FVector BoxExtent = ReverseGravityTrigger->GetScaledBoxExtent();
-    FVector MeshScale = BoxExtent / 50.0f; // SM_Cube 기본 사이즈가 100x100x100
-    StaticMeshComp->SetRelativeScale3D(MeshScale); 
+    FVector BoxExtent = FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize);
+    float HalfSizeOfSide = 50.0f; // SM_Cube 기본 사이즈가 100x100x100 -> 반경(Extent) 기준 50
+    FVector LocationOffset = FVector(-HalfSizeOfSide, -HalfSizeOfSide, -HalfSizeOfSide);
+    FVector MeshScale = BoxExtent / HalfSizeOfSide;
 
-    static ConstructorHelpers::FObjectFinder<UMaterialInstance> MaterialRef(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Material/MAT_AntyGravity_Inst.MAT_AntyGravity_Inst'"));
-    if (nullptr != MaterialRef.Object)
+    StaticMeshComp->SetRelativeLocation(LocationOffset * MeshScale);
+    StaticMeshComp->SetRelativeScale3D(MeshScale);
+
+    static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_AntyGravity.MAT_AntyGravity'"));
+    
+    if ( MaterialRef.Succeeded() )
     {
-        StaticMeshComp->SetMaterial(0, MaterialRef.Object);
+        UMaterialInstanceDynamic* DynMaterial = UMaterialInstanceDynamic::Create(MaterialRef.Object, this);
+        if (DynMaterial)
+        {
+            float OutBaseValue = 2.0f;
+            DynMaterial->GetScalarParameterValue(FName(TEXT("Tiling")), OutBaseValue);
+            DynMaterial->SetScalarParameterValue(FName(TEXT("Tiling")), OutBaseValue * MeshScale.X);
+            StaticMeshComp->SetMaterial(0, DynMaterial);
+        }
     }
 }
 
@@ -71,17 +83,17 @@ void ACSTA_ReverseGravityBox::BeginPlay()
         FVector BoxExtent = ReverseGravityTrigger->GetScaledBoxExtent(); // 스케일이 적용된 박스 크기
         FQuat   BoxRotation = ReverseGravityTrigger->GetComponentRotation().Quaternion();
 
-        DrawDebugBox(
-            GetWorld(),
-            BoxLocation,
-            BoxExtent,
-            BoxRotation,
-            FColor::Green,
-            false,  // 지속 표시
-            DurtionTime, // -1은 시간 제한 없음
-            0,     // 디버그 선 우선순위
-            2.0f   // 선 두께
-        );
+        //DrawDebugBox(
+        //    GetWorld(),
+        //    BoxLocation,
+        //    BoxExtent,
+        //    BoxRotation,
+        //    FColor::Green,
+        //    false,  // 지속 표시
+        //    DurtionTime, // -1은 시간 제한 없음
+        //    0,     // 디버그 선 우선순위
+        //    2.0f   // 선 두께
+        //);
     }
 }
 
