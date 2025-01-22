@@ -24,10 +24,10 @@ void UCSGA_TimePauseArea::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 void UCSGA_TimePauseArea::ActivateTask()
 {
 	
-	UCSAT_TimePauseArea* BoxTask = UCSAT_TimePauseArea::CreateTask(this, UCSAT_TimePauseArea::StaticClass());
-	//BoxTask->SetDurtionTime(1.0f);
-	//BoxTask->OnComplete.AddDynamic(this, &UCSGA_ReverseGravity::StopActivateTask);
-	BoxTask->ReadyForActivation();
+	UCSAT_TimePauseArea* TimePauseTask = UCSAT_TimePauseArea::CreateTask(this, ACSTA_TimePauseArea::StaticClass());
+	TimePauseTask->SetDurtionTime(1.0f);
+	TimePauseTask->OnComplete.AddDynamic(this, &UCSGA_TimePauseArea::StopActivateTask);
+	TimePauseTask->ReadyForActivation();
 	
 }
 

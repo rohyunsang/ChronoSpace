@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-//#include "GA/TA/CSTA_TimePauseArea.h"
 #include "CSAT_TimePauseArea.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTimePauseEndDelegate);

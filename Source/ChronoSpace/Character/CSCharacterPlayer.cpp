@@ -55,7 +55,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	{
 		PauseTimeAction = InputActionPauseTimeRef.Object;
 	}
-
+	// /Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_PauseTime.IA_PauseTime'
 
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
@@ -182,6 +182,7 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
+
 		EnhancedInputComponent->BindAction(PauseTimeAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimePause);
 		EnhancedInputComponent->BindAction(PauseTimeAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimePause);
 
