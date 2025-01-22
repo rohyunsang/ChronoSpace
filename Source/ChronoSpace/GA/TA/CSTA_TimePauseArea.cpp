@@ -25,29 +25,6 @@ ACSTA_TimePauseArea::ACSTA_TimePauseArea()
 }
 
 
-
-void ACSTA_TimePauseArea::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-    for (auto Act = ActorsThatIsPausedTime.CreateIterator(); Act; ++Act)
-    {
-        if (!IsValid(Act.Value())) continue;
-
-        ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
-        if (RemainedCharacter)
-        {
-            UCharacterMovementComponent* MovementComp = RemainedCharacter->GetCharacterMovement();
-            if (!MovementComp) continue;
-            if (MovementComp->GravityScale > 0) continue;
-
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
-        }
-
-        ActorsThatIsPausedTime.FindAndRemoveChecked(Act.Value()->GetFName());
-    }
-    Super::EndPlay(EndPlayReason);
-}
-
 void ACSTA_TimePauseArea::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
@@ -87,45 +64,75 @@ void ACSTA_TimePauseArea::BeginPlay()
     }
 }
 
+
+void ACSTA_TimePauseArea::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    for (auto Act = ActorsThatIsPausedTime.CreateIterator(); Act; ++Act)
+    {
+        if (!IsValid(Act.Value())) continue;
+
+        ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
+        if (RemainedCharacter)
+        {
+            // 시간 복원
+            if (RemainedCharacter->CustomTimeDilation != 1.0f)
+            {
+                RemainedCharacter->CustomTimeDilation = 1.0f;
+                UE_LOG(LogTemp, Log, TEXT("CustomTimeDilation reset to 1.0 for actor: %s"), *RemainedCharacter->GetName());
+            }
+
+            // 기존 GravityScale 처리 부분 제거
+            // 시간 복원만 수행하고 중복된 논리는 제거했습니다.
+        }
+
+        // 목록에서 제거
+        ActorsThatIsPausedTime.FindAndRemoveChecked(Act.Value()->GetFName());
+    }
+
+    // 부모 클래스의 EndPlay 호출
+    Super::EndPlay(EndPlayReason);
+}
+
 void ACSTA_TimePauseArea::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
 
     if (DetectedCharacter)
     {
-        UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
-        if (MovementComp)
+        // 시간 진행 멈추기
+        if (DetectedCharacter->CustomTimeDilation == 0.0f)
         {
-            if (MovementComp->GravityScale < 0)
-            {
-                return;
-            }
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
-
-            ActorsThatIsPausedTime.Emplace(OtherActor->GetFName(), OtherActor);
+            // 이미 멈춘 상태라면 다시 처리하지 않음
+            return;
         }
+        DetectedCharacter->CustomTimeDilation = 0.0f;
+
+        // 배우를 멈춘 목록에 추가
+        ActorsThatIsPausedTime.Emplace(OtherActor->GetFName(), OtherActor);
     }
 }
 
 void ACSTA_TimePauseArea::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    //UE_LOG(LogCS, Log, TEXT("OnTriggerEndOverlap called: %s"), *OtherActor->GetName());
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
     if (DetectedCharacter)
     {
-        UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
-        if (MovementComp)
+        // 시간 복원
+        if (DetectedCharacter->CustomTimeDilation <= 1.001f && DetectedCharacter->CustomTimeDilation >= 0.999f)
         {
-            if (MovementComp->GravityScale > 0)
-            {
-                return;
-            }
+            // 이미 시간이 정상 상태라면 다시 처리하지 않음
+            return;
+        }
 
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
+        DetectedCharacter->CustomTimeDilation = 1.0f;
 
+        // 멈춘 시간 목록에서 제거
+        if (ActorsThatIsPausedTime.Contains(OtherActor->GetFName()))
+        {
             ActorsThatIsPausedTime.FindAndRemoveChecked(OtherActor->GetFName());
         }
+
+        // 디버그 로그 출력
+        UE_LOG(LogTemp, Log, TEXT("Time resumed for actor: %s"), *OtherActor->GetName());
     }
 }
