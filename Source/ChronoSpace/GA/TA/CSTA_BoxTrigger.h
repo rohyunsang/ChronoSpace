@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GA/TA/CSTA_DurationBase.h"
+#include "Abilities/GameplayAbilityTargetActor.h"
 #include "CSTA_BoxTrigger.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTargetActorEndedDelegate);
 
 /**
  * 
  */
 UCLASS()
-class CHRONOSPACE_API ACSTA_BoxTrigger : public ACSTA_DurationBase
+class CHRONOSPACE_API ACSTA_BoxTrigger : public AGameplayAbilityTargetActor
 {
 	GENERATED_BODY()
 	
@@ -20,6 +20,8 @@ public:
 	ACSTA_BoxTrigger();
 
 	virtual void BeginPlay() override;
+
+	FTargetActorEndedDelegate OnComplete;
 
 protected:
 	void SetSteticMeshMaterial(class UMaterial* Material, float Scale);
@@ -38,5 +40,4 @@ protected:
 
 	FVector MeshScale;
 	bool bShowDebug = true;
-	
 };
