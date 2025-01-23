@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
+#include "Character/CSCharacterPlayer.h"
 #include "ChronoSpace.h"
 
 
@@ -19,7 +20,7 @@ ACSTA_TimePauseBox::ACSTA_TimePauseBox()
     BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_TimePauseBox::OnTriggerBeginOverlap);
     BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_TimePauseBox::OnTriggerEndOverlap);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_AntyGravity.MAT_AntyGravity'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_TimePause.MAT_TimePause'"));
 
     SetSteticMeshMaterial(MaterialRef.Object, MeshScale.X);
 }
@@ -33,12 +34,12 @@ void ACSTA_TimePauseBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
         ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
         if (RemainedCharacter)
         {
-            UCharacterMovementComponent* MovementComp = RemainedCharacter->GetCharacterMovement();
-            if (!MovementComp) continue;
-            if (MovementComp->GravityScale > 0) continue;
-
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
+            // 시간 복원
+            if (RemainedCharacter->CustomTimeDilation != 1.0f)
+            {
+                RemainedCharacter->CustomTimeDilation = 1.0f;
+                UE_LOG(LogTemp, Log, TEXT("CustomTimeDilation reset to 1.0 for actor: %s"), *RemainedCharacter->GetName());
+            }
         }
 
         ActorsInBoxTrigger.FindAndRemoveChecked(Act.Value()->GetFName());
@@ -63,43 +64,44 @@ void ACSTA_TimePauseBox::ConfirmTargetingAndContinue()
 
 void ACSTA_TimePauseBox::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
+
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
+    ACSCharacterPlayer* DetectedCharacterPlayer = Cast<ACSCharacterPlayer>(OtherActor);
+
+    if (DetectedCharacterPlayer)
+    {
+        // 시간 정지의 영향을 받지 않도록 제외
+        return;
+    }
 
     if (DetectedCharacter)
     {
-        UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
-        if (MovementComp)
+        // 시간 진행 멈추기
+        if (DetectedCharacter->CustomTimeDilation == 0.0f)
         {
-            if (MovementComp->GravityScale < 0)
-            {
-                return;
-            }
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
-
-            ActorsInBoxTrigger.Emplace(OtherActor->GetFName(), OtherActor);
+            // 이미 멈춘 상태라면 다시 처리하지 않음
+            return;
         }
+        DetectedCharacter->CustomTimeDilation = 0.0f;
+
+        ActorsInBoxTrigger.Emplace(OtherActor->GetFName(), OtherActor);
     }
 }
 
 void ACSTA_TimePauseBox::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-    //UE_LOG(LogCS, Log, TEXT("OnTriggerEndOverlap called: %s"), *OtherActor->GetName());
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
     if (DetectedCharacter)
     {
-        UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
-        if (MovementComp)
+        // 시간 복원
+        if (DetectedCharacter->CustomTimeDilation == 1.0f)
         {
-            if (MovementComp->GravityScale > 0)
-            {
-                return;
-            }
-
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
-
-            ActorsInBoxTrigger.FindAndRemoveChecked(OtherActor->GetFName());
+            // 이미 시간이 정상 상태라면 다시 처리하지 않음
+            return;
         }
+
+        DetectedCharacter->CustomTimeDilation = 1.0f;
+
+        ActorsInBoxTrigger.FindAndRemoveChecked(OtherActor->GetFName());
     }
 }

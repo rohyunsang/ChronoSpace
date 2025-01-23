@@ -80,6 +80,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 
 	// ASC
 	ASC = nullptr;
+
 }
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
