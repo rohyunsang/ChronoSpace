@@ -50,6 +50,12 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		ReverseGravityAction = InputActionReverseGravityRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTimePauseRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_TimePause.IA_TimePause'"));
+	if (nullptr != InputActionTimePauseRef.Object)
+	{
+		TimePauseAction = InputActionTimePauseRef.Object;
+	}
+
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
 	EnergyBar->SetupAttachment(GetMesh());
@@ -175,6 +181,11 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
+		EnhancedInputComponent->BindAction(TimePauseAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimePause);
+		EnhancedInputComponent->BindAction(TimePauseAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimePause);
+
+
+
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
 	else if (!IsValid(ASC))
