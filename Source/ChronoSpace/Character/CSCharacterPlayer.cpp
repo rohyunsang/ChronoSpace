@@ -12,9 +12,15 @@
 #include "Net/UnrealNetwork.h"
 #include "UI/CSGASWidgetComponent.h"
 #include "UI/CSGASUserWidget.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Physics/CSCollision.h"
+#include "ChronoSpace.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -74,6 +80,15 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 
 	// ASC
 	ASC = nullptr;
+
+	// Trigger
+	Trigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger"));
+	Trigger->InitCapsuleSize(50.f, 100.0f);
+	Trigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
+	Trigger->SetupAttachment(GetCapsuleComponent());
+	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
+	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
 }
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
@@ -134,6 +149,30 @@ void ACSCharacterPlayer::BeginPlay()
 	SetupGASInputComponent();
 }
 
+void ACSCharacterPlayer::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if ( GetCharacterMovement()->Velocity.IsNearlyZero() )
+	{
+		return;
+	}
+
+	FVector ForwardDirection = GetMesh()->GetComponentRotation().Vector();
+	FVector Power = FVector(10000.0f, 10000.0f, 0.0f);
+	Power.X *= -ForwardDirection.Y;
+	Power.Y *= ForwardDirection.X;
+
+	for (auto Char = CharsInPushing.CreateIterator(); Char; ++Char)
+	{
+		if ( IsValid(Char.Value()) )
+		{
+			Char.Value()->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+			Char.Value()->GetCharacterMovement()->AddImpulse(Power);
+		}
+	}
+}
+
 void ACSCharacterPlayer::SetDead()
 {
 	Super::SetDead();
@@ -142,6 +181,32 @@ void ACSCharacterPlayer::SetDead()
 	if (PlayerController) 
 	{
 		DisableInput(PlayerController); 
+	}
+}
+
+void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
+{
+	if (nullptr != Cast<ACSCharacterPlayer>(OtherActor)) return;
+
+	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
+
+	if (OverlappedCharacter)
+	{
+		CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
+
+		UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap : %s"), *OtherActor->GetName());
+	}
+}
+
+void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (nullptr != Cast<ACSCharacterPlayer>(OtherActor)) return;
+
+	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
+
+	if (OverlappedCharacter)
+	{
+		CharsInPushing.FindAndRemoveChecked(OverlappedCharacter->GetFName());
 	}
 }
 

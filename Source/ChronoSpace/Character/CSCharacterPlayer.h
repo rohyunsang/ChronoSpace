@@ -32,8 +32,14 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetDead() override;
+
+	UFUNCTION()
+	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
+	
+	UFUNCTION()
+	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 // Camera Section
 protected:
@@ -77,4 +83,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UCSGASWidgetComponent> EnergyBar;
+
+// Trigger Section
+protected:
+	UPROPERTY()
+	TObjectPtr<class UCapsuleComponent> Trigger;
+
+	UPROPERTY()
+	TMap< FName, TObjectPtr<ACharacter> > CharsInPushing;
 };

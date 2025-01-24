@@ -6,7 +6,7 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "CSAT_DurationTask.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReverseGravityEndDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDurationEndDelegate);
 
 /**
  * 
@@ -22,15 +22,17 @@ public:
 	FORCEINLINE void SetDurtionTime(float InDurtionTime) { DurationTime = InDurtionTime; }
 
 	UPROPERTY(BlueprintAssignable)
-	FReverseGravityEndDelegate OnComplete;
+	FDurationEndDelegate OnComplete;
 
 protected:
 	UFUNCTION()
 	void OnTargetActorReadyCallback();
 
+	// 서브 클래스 구현 필요 -------------------------------
 	virtual void SpawnAndInitializeTargetActor() {};
 	virtual void FinalizeTargetActor() {};
 	virtual void EndTargetActor() {};
+	// ---------------------------------------------------
 
 	UPROPERTY()
 	TSubclassOf<class AGameplayAbilityTargetActor> TargetActorClass;
