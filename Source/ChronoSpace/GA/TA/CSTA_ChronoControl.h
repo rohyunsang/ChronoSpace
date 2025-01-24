@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include "GA/TA/CSTA_BoxTrigger.h"
-#include "CSTA_TimePauseBox.generated.h"
+#include "CSTA_ChronoControl.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHRONOSPACE_API ACSTA_TimePauseBox : public ACSTA_BoxTrigger
+class CHRONOSPACE_API ACSTA_ChronoControl : public ACSTA_BoxTrigger
 {
 	GENERATED_BODY()
 
 public:
-	ACSTA_TimePauseBox();
+	ACSTA_ChronoControl();
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 

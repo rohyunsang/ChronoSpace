@@ -14,7 +14,7 @@ enum class EAbilityIndex : uint8
 	ReverseGravity = 0,
 	BlackHole = 1,
 
-	TimePause = 100
+	ChronoControl = 100
 };
 
 /**
@@ -63,7 +63,7 @@ protected:
 	TObjectPtr<class UInputAction> ReverseGravityAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> TimePauseAction;
+	TObjectPtr<class UInputAction> ChronoControlAction;
 
 // ASC Section
 protected:

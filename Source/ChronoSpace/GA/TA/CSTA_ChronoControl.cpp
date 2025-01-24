@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GA/TA/CSTA_TimePauseBox.h"
+#include "GA/TA/CSTA_ChronoControl.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
 #include "GameFramework/Character.h"
@@ -12,20 +12,20 @@
 #include "ChronoSpace.h"
 
 
-ACSTA_TimePauseBox::ACSTA_TimePauseBox()
+ACSTA_ChronoControl::ACSTA_ChronoControl()
 {
     bShowDebug = false;
 
     // Trigger
-    BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_TimePauseBox::OnTriggerBeginOverlap);
-    BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_TimePauseBox::OnTriggerEndOverlap);
+    BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ChronoControl::OnTriggerBeginOverlap);
+    BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ChronoControl::OnTriggerEndOverlap);
 
     static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_TimePause.MAT_TimePause'"));
 
     SetSteticMeshMaterial(MaterialRef.Object, MeshScale.X);
 }
 
-void ACSTA_TimePauseBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ACSTA_ChronoControl::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     for (auto Act = ActorsInBoxTrigger.CreateIterator(); Act; ++Act)
     {
@@ -47,13 +47,13 @@ void ACSTA_TimePauseBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 }
 
-void ACSTA_TimePauseBox::StartTargeting(UGameplayAbility* Ability)
+void ACSTA_ChronoControl::StartTargeting(UGameplayAbility* Ability)
 {
     Super::StartTargeting(Ability);
     SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
 }
 
-void ACSTA_TimePauseBox::ConfirmTargetingAndContinue()
+void ACSTA_ChronoControl::ConfirmTargetingAndContinue()
 {
     //UE_LOG(LogCS, Log, TEXT("ConfirmTargetingAndContinue"));
     if (SourceActor)
@@ -62,7 +62,7 @@ void ACSTA_TimePauseBox::ConfirmTargetingAndContinue()
     }
 }
 
-void ACSTA_TimePauseBox::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
+void ACSTA_ChronoControl::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
 
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
@@ -88,7 +88,7 @@ void ACSTA_TimePauseBox::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCo
     }
 }
 
-void ACSTA_TimePauseBox::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ACSTA_ChronoControl::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
     if (DetectedCharacter)

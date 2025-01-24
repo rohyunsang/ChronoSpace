@@ -4,20 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GA/AT/CSAT_DurationTask.h"
-#include "CSAT_TimePauseBox.generated.h"
+#include "CSAT_ChronoControl.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHRONOSPACE_API UCSAT_TimePauseBox : public UCSAT_DurationTask
+class CHRONOSPACE_API UCSAT_ChronoControl : public UCSAT_DurationTask
 {
 	GENERATED_BODY()
 public:
-	UCSAT_TimePauseBox();
+	UCSAT_ChronoControl();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "ReverseGravity", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UCSAT_TimePauseBox* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_TimePauseBox> InTargetActorClass);
+	static UCSAT_ChronoControl* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_ChronoControl> InTargetActorClass);
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
@@ -28,5 +28,5 @@ protected:
 	virtual void EndTargetActor() override;
 
 	UPROPERTY()
-	TObjectPtr< class ACSTA_TimePauseBox > SpawnedTargetActor;
+	TObjectPtr< class ACSTA_ChronoControl > SpawnedTargetActor;
 };

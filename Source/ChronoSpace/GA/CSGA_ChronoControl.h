@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "CSGA_TimePause.generated.h"
+#include "CSGA_ChronoControl.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CHRONOSPACE_API UCSGA_TimePause : public UGameplayAbility
+class CHRONOSPACE_API UCSGA_ChronoControl : public UGameplayAbility
 {
 	GENERATED_BODY()
 	
 public:
-	UCSGA_TimePause();
+	UCSGA_ChronoControl();
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	FORCEINLINE const float GetDurationTime() const { return DurationTime; }
