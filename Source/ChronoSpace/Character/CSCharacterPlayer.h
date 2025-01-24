@@ -14,7 +14,8 @@ enum class EAbilityIndex : uint8
 	ReverseGravity = 0,
 	BlackHole = 1,
 
-	ChronoControl = 100
+	ChronoControl = 100,
+	AbilityPreviewBox = 200 
 };
 
 /**
@@ -64,6 +65,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ChronoControlAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AbilityPreviewAction;
 
 // ASC Section
 protected:

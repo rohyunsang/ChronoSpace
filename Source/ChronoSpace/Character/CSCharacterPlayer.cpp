@@ -55,6 +55,11 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	{
 		ChronoControlAction = InputActionChronoControlRef.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAbilityPreviewRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_AbilityPreview.IA_AbilityPreview'"));
+	if (nullptr != InputActionAbilityPreviewRef.Object)
+	{
+		AbilityPreviewAction = InputActionAbilityPreviewRef.Object;
+	}
 
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
@@ -182,8 +187,12 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
+
 		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ChronoControl);
 		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ChronoControl);
+
+		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::AbilityPreviewBox);
+		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::AbilityPreviewBox);
 
 
 
