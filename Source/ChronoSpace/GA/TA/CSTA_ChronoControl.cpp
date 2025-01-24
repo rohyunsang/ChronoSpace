@@ -20,7 +20,7 @@ ACSTA_ChronoControl::ACSTA_ChronoControl()
     BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ChronoControl::OnTriggerBeginOverlap);
     BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ChronoControl::OnTriggerEndOverlap);
 
-    static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_TimePause.MAT_TimePause'"));
+    static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_ChronoControl.MAT_ChronoControl'"));
 
     SetSteticMeshMaterial(MaterialRef.Object, MeshScale.X);
 }

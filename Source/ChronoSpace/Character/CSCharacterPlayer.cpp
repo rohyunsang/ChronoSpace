@@ -50,7 +50,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		ReverseGravityAction = InputActionReverseGravityRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChronoControlRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_TimePause.IA_TimePause'"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChronoControlRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ChronoControl.IA_ChronoControl'"));
 	if (nullptr != InputActionChronoControlRef.Object)
 	{
 		ChronoControlAction = InputActionChronoControlRef.Object;
