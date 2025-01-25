@@ -4,10 +4,6 @@
 #include "GA/CSGA_ReverseGravity.h"
 #include "GA/AT/CSAT_ReverseGravityBox.h"
 #include "GA/TA/CSTA_ReverseGravityBox.h"
-#include "AbilitySystemBlueprintLibrary.h"
-#include "Components/StaticMeshComponent.h"
-#include "GameFramework/Character.h"
-#include "Components/CapsuleComponent.h"
 #include "ChronoSpace.h"
 
 UCSGA_ReverseGravity::UCSGA_ReverseGravity()

@@ -13,7 +13,9 @@ enum class EAbilityIndex : uint8
 {
 	ReverseGravity = 1,
 	BlackHole = 2,
-	WhiteHole = 3
+	WhiteHole = 3,
+	WeakenGravity10P = 4,
+	WeakenGravity50P = 5
 };
 
 /**
@@ -59,6 +61,9 @@ protected:
 	TObjectPtr<class UInputMappingContext> MappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ShoulderMoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
@@ -72,6 +77,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> WhiteHoleAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> WeakenGravity10PAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> WeakenGravity50PAction;
 
 // ASC Section
 protected:

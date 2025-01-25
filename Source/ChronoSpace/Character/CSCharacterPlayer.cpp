@@ -39,6 +39,12 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		MappingContext = InputMappingContextRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Jump.IA_Jump'"));
+	if (nullptr != InputActionJumpRef.Object)
+	{
+		JumpAction = InputActionJumpRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	if (nullptr != InputActionShoulderMoveRef.Object)
 	{
@@ -67,6 +73,18 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	if (nullptr != InputActionWhiteHoleRef.Object)
 	{
 		WhiteHoleAction = InputActionWhiteHoleRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWeakenGravity10PActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WeakenGravity10P.IA_WeakenGravity10P'"));
+	if (nullptr != InputActionBlackHoleRef.Object)
+	{
+		WeakenGravity10PAction = InputActionWeakenGravity10PActionRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWeakenGravity50PActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WeakenGravity50P.IA_WeakenGravity50P'"));
+	if (nullptr != InputActionWhiteHoleRef.Object)
+	{
+		WeakenGravity50PAction = InputActionWeakenGravity50PActionRef.Object;
 	}
 
 	// UI 
@@ -143,6 +161,8 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
 }
@@ -256,6 +276,10 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::BlackHole);
 		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WhiteHole);
 		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WhiteHole);
+		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity10P);
+		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity10P);
+		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity50P);
+		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity50P);
 
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
 	}

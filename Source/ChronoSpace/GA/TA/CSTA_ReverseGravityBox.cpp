@@ -55,7 +55,7 @@ void ACSTA_ReverseGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
             MovementComp->GravityScale *= -1.0f;
         }
         
-        ActorsInBoxTrigger.FindAndRemoveChecked(Act.Value()->GetFName());
+        ActorsInBoxTrigger.Remove(Act.Value()->GetFName());
     }
     Super::EndPlay(EndPlayReason);
 }
