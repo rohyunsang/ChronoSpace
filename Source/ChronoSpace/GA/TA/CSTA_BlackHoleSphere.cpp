@@ -147,7 +147,10 @@ void ACSTA_BlackHoleSphere::OnEventHorizonBeginOverlap(UPrimitiveComponent* Over
 		FVector NewLocation = WhiteHall->GetActorLocation();
 		
 		OtherActor->SetActorLocation(NewLocation);
-		CharactersInSphereTrigger.Remove(OverlapedCharacter->GetFName());
+		if ( (GravitySphereTrigger->GetComponentLocation() - NewLocation).Size() > GravityInfluenceRange )
+		{
+			CharactersInSphereTrigger.Remove(OverlapedCharacter->GetFName());
+		}
 	}
 	else if (OverlapedCharacter)
 	{
