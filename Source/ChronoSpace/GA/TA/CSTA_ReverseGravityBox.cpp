@@ -99,7 +99,7 @@ void ACSTA_ReverseGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlappe
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= -1.0f;
 
-            ActorsInBoxTrigger.FindAndRemoveChecked(OtherActor->GetFName());
+            ActorsInBoxTrigger.Remove(OtherActor->GetFName());
         }
     }
 }

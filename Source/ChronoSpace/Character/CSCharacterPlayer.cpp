@@ -14,6 +14,7 @@
 #include "UI/CSGASUserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
 #include "ChronoSpace.h"
 
@@ -54,6 +55,18 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	if (nullptr != InputActionReverseGravityRef.Object)
 	{
 		ReverseGravityAction = InputActionReverseGravityRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionBlackHoleRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_BlackHole.IA_BlackHole'"));
+	if (nullptr != InputActionBlackHoleRef.Object)
+	{
+		BlackHoleAction = InputActionBlackHoleRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWhiteHoleRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WhiteHole.IA_WhiteHole'"));
+	if (nullptr != InputActionWhiteHoleRef.Object)
+	{
+		WhiteHoleAction = InputActionWhiteHoleRef.Object;
 	}
 
 	// UI 
@@ -167,7 +180,6 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 	{
 		if ( IsValid(Char.Value()) )
 		{
-			Char.Value()->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 			Char.Value()->GetCharacterMovement()->AddImpulse(Power);
 		}
 	}
@@ -206,7 +218,7 @@ void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComp
 
 	if (OverlappedCharacter)
 	{
-		CharsInPushing.FindAndRemoveChecked(OverlappedCharacter->GetFName());
+		CharsInPushing.Remove(OverlappedCharacter->GetFName());
 	}
 }
 
@@ -240,6 +252,11 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
+		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::BlackHole);
+		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::BlackHole);
+		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WhiteHole);
+		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WhiteHole);
+
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
 	else if (!IsValid(ASC))
@@ -258,7 +275,7 @@ void ACSCharacterPlayer::GASInputPressed(int32 InputId)
 	if (Spec)
 	{
 		if (Spec->InputPressed) return;
-
+		UE_LOG(LogCS, Log, TEXT("GASInputPressed"));
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{
@@ -283,4 +300,15 @@ void ACSCharacterPlayer::GASInputReleased(int32 InputId)
 		}
 	}
 }
+
+void ACSCharacterPlayer::ClearWhiteHall()
+{
+	if ( IsValid(WhiteHall) )
+	{
+		WhiteHall->Destroy();
+	}
+	WhiteHall = nullptr;
+}
+
+
 

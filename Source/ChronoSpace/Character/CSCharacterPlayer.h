@@ -11,8 +11,9 @@
 UENUM()
 enum class EAbilityIndex : uint8
 {
-	ReverseGravity = 0,
-	BlackHole = 1
+	ReverseGravity = 1,
+	BlackHole = 2,
+	WhiteHole = 3
 };
 
 /**
@@ -66,6 +67,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ReverseGravityAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> BlackHoleAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> WhiteHoleAction;
+
 // ASC Section
 protected:
 	void SetupGASInputComponent();
@@ -91,4 +98,14 @@ protected:
 
 	UPROPERTY()
 	TMap< FName, TObjectPtr<ACharacter> > CharsInPushing;
+
+// WhiteHall
+public:
+	FORCEINLINE class ACSWhiteHall* GetWhiteHall() { return WhiteHall; }
+	void SetWhiteHall(class ACSWhiteHall* InWhiteHall) { WhiteHall = InWhiteHall; }
+	void ClearWhiteHall();
+
+protected:
+	UPROPERTY()
+	TObjectPtr<class ACSWhiteHall> WhiteHall;
 };

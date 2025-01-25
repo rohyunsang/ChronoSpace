@@ -14,13 +14,14 @@ UCSAT_BlackHoleSphere* UCSAT_BlackHoleSphere::CreateTask(UGameplayAbility* Ownin
 {
 	UCSAT_BlackHoleSphere* NewTask = NewAbilityTask<UCSAT_BlackHoleSphere>(OwningAbility);
 	NewTask->TargetActorClass = InTargetActorClass;
-
+	
 	return NewTask;
 }
 
 void UCSAT_BlackHoleSphere::Activate()
 {
 	Super::Activate();
+	UE_LOG(LogCS, Log, TEXT("UCSAT_BlackHoleSphere Activate"));
 	SpawnAndInitializeTargetActor();
 	FinalizeTargetActor();
 
@@ -40,9 +41,10 @@ void UCSAT_BlackHoleSphere::OnDestroy(bool AbilityEnded)
 void UCSAT_BlackHoleSphere::SpawnAndInitializeTargetActor()
 {
 	SpawnedTargetActor = Cast<ACSTA_BlackHoleSphere>(GetWorld()->SpawnActorDeferred<ACSTA_BlackHoleSphere>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
+	
 	if (SpawnedTargetActor)
 	{
-		//SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_ReverseGravityBox::OnTargetActorReadyCallback);
+		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_BlackHoleSphere::OnTargetActorReadyCallback);
 	}
 }
 
