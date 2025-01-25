@@ -18,8 +18,6 @@ class CHRONOSPACE_API ACSTA_ReverseGravityBox : public ACSTA_BoxTrigger
 public:
 	ACSTA_ReverseGravityBox();
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 	virtual void ConfirmTargetingAndContinue() override;

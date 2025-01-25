@@ -21,40 +21,12 @@ ACSTA_WeakenGravityBox::ACSTA_WeakenGravityBox()
 
     static ConstructorHelpers::FObjectFinder<UMaterial> MaterialRef(TEXT("/Script/Engine.Material'/Game/Material/MAT_AntyGravity.MAT_AntyGravity'"));
     SetSteticMeshMaterial(MaterialRef.Object, MeshScale.X);
-
-    
 }
 
 void ACSTA_WeakenGravityBox::BeginPlay()
 {
+    Super::BeginPlay();
     SaturationSetting();
-}
-
-void ACSTA_WeakenGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-    if ( GravityCoef <= 0.0f || GravityCoef >= 1.0f )
-    {
-        UE_LOG(LogCS, Error, TEXT("GravityCoef Size Error")); 
-        return;
-    }
-
-    for (auto Act = ActorsInBoxTrigger.CreateIterator(); Act; ++Act)
-    {
-        if (!IsValid(Act.Value())) continue;
-
-        ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
-        if (RemainedCharacter)
-        {
-            UCharacterMovementComponent* MovementComp = RemainedCharacter->GetCharacterMovement();
-            if (!MovementComp) continue;
-
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale /= GravityCoef;
-        }
-
-        ActorsInBoxTrigger.Remove(Act.Value()->GetFName());
-    }
-    Super::EndPlay(EndPlayReason);
 }
 
 void ACSTA_WeakenGravityBox::StartTargeting(UGameplayAbility* Ability)
@@ -86,10 +58,6 @@ void ACSTA_WeakenGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* Overlapp
         UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
         if (MovementComp)
         {
-            if (MovementComp->GravityScale < 0)
-            {
-                return;
-            }
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= GravityCoef;
 
@@ -112,11 +80,6 @@ void ACSTA_WeakenGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlapped
         UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
         if (MovementComp)
         {
-            if (MovementComp->GravityScale > 0)
-            {
-                return;
-            }
-
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale /= GravityCoef;
 

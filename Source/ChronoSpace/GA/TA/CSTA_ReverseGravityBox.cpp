@@ -38,29 +38,6 @@ void ACSTA_ReverseGravityBox::ConfirmTargetingAndContinue()
 	}
 }
 
-void ACSTA_ReverseGravityBox::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-    for (auto Act = ActorsInBoxTrigger.CreateIterator(); Act; ++Act)
-    {
-        if (!IsValid(Act.Value())) continue;
-        
-        ACharacter* RemainedCharacter = Cast<ACharacter>(Act.Value());
-        if (RemainedCharacter)
-        {
-            UCharacterMovementComponent* MovementComp = RemainedCharacter->GetCharacterMovement();
-            if (!MovementComp) continue;
-            if (MovementComp->GravityScale > 0) continue;
-                
-            MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
-            MovementComp->GravityScale *= -1.0f;
-        }
-        
-        ActorsInBoxTrigger.Remove(Act.Value()->GetFName());
-    }
-    Super::EndPlay(EndPlayReason);
-}
-
-
 void ACSTA_ReverseGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
     ACharacter* DetectedCharacter = Cast<ACharacter>(OtherActor);
@@ -70,6 +47,7 @@ void ACSTA_ReverseGravityBox::OnTriggerBeginOverlap(UPrimitiveComponent* Overlap
         UCharacterMovementComponent* MovementComp = DetectedCharacter->GetCharacterMovement();
         if (MovementComp)
         {
+            UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap called: %f"), MovementComp->GravityScale);
             if (MovementComp->GravityScale < 0)
             {
                 return;
@@ -98,7 +76,7 @@ void ACSTA_ReverseGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlappe
 
             MovementComp->AddImpulse(FVector(0.0f, 0.0f, 0.1f));
             MovementComp->GravityScale *= -1.0f;
-
+            UE_LOG(LogCS, Log, TEXT("OnTriggerEndOverlap called: %f"), MovementComp->GravityScale);
             ActorsInBoxTrigger.Remove(OtherActor->GetFName());
         }
     }

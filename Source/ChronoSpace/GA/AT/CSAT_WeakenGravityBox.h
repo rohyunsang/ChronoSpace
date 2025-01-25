@@ -33,5 +33,5 @@ protected:
 	UPROPERTY()
 	TObjectPtr< class ACSTA_WeakenGravityBox > SpawnedTargetActor;
 
-	float GravityCoef;
+	float GravityCoef = 0.1f;
 };

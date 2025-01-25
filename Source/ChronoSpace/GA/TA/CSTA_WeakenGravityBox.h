@@ -19,8 +19,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 
 	virtual void ConfirmTargetingAndContinue() override;
@@ -37,5 +35,5 @@ protected:
 	void SaturationSetting();
 
 	UPROPERTY(EditAnywhere, Category = "GravityCoef")
-	float GravityCoef;
+	float GravityCoef = 0.1f;
 };
