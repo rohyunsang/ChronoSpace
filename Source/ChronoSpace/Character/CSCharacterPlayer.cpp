@@ -131,29 +131,9 @@ UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 void ACSCharacterPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
-	if (CSPS)
-	{
-		ASC = CSPS->GetAbilitySystemComponent();
-		ASC->InitAbilityActorInfo(CSPS, this);
-
-		for (const auto& StartAbility : StartAbilities)
-		{
-			FGameplayAbilitySpec StartSpec(StartAbility);
-			ASC->GiveAbility(StartSpec);
-		}
-
-		for (const auto& StartInputAbility : StartInputAbilities)
-		{
-			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
-			StartSpec.InputID = StartInputAbility.Key;
-			ASC->GiveAbility(StartSpec);
-		}
-
-		/*APlayerController* PlayerController = CastChecked<APlayerController>(NewController);
-		PlayerController->ConsoleCommand(TEXT("showdebug abilitysystem"));*/
-	}
+	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] PossessedBy"), GetWorld()->GetNetMode());
+	SetASC();
+	
 }
 
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -166,12 +146,16 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
+
+	SetupGASInputComponent();
 }
 
 void ACSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
+	
+	// 이 밑으론 로컬 컨트롤러만 진입 가능
 	if (!IsLocallyControlled()) return;
 
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
@@ -180,7 +164,7 @@ void ACSCharacterPlayer::BeginPlay()
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
 
-	SetupGASInputComponent();
+	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
 }
 
 void ACSCharacterPlayer::Tick(float DeltaSeconds)
@@ -217,11 +201,37 @@ void ACSCharacterPlayer::SetDead()
 	}
 }
 
+void ACSCharacterPlayer::SetASC()
+{
+	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
+	if (CSPS)
+	{
+		ASC = CSPS->GetAbilitySystemComponent();
+		ASC->InitAbilityActorInfo(CSPS, this);
+
+		for (const auto& StartAbility : StartAbilities)
+		{
+			FGameplayAbilitySpec StartSpec(StartAbility);
+			ASC->GiveAbility(StartSpec);
+		}
+
+		for (const auto& StartInputAbility : StartInputAbilities)
+		{
+			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
+			StartSpec.InputID = StartInputAbility.Key;
+			ASC->GiveAbility(StartSpec);
+		}
+
+		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - ASC Not Found"), GetWorld()->GetNetMode());
+	}
+}
+
 void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
-	UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap %s"), *OtherActor->GetName());
-	
-
 	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor))
 	{
 		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
@@ -229,8 +239,6 @@ void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCo
 		if (OverlappedCharacter)
 		{
 			CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
-
-			UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap : %s"), *OtherActor->GetName());
 		}
 	}	
 }
@@ -267,8 +275,8 @@ void ACSCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 void ACSCharacterPlayer::SetupGASInputComponent()
 {
-	UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Start"));
-	if (IsValid(ASC) && IsValid(InputComponent))
+	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] SetupGASInputComponent Start"), GetWorld()->GetNetMode());
+	if (IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
@@ -281,21 +289,38 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity10P);
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity50P);
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity50P);
-
-		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
-	}
-	else if (!IsValid(ASC))
-	{
-		UE_LOG(LogTemp, Log, TEXT("Invalid ASC"));
+		UE_LOG(LogCS, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Invalid InputComponent"));
+		UE_LOG(LogCS, Log, TEXT("Invalid InputComponent"));
 	}
 }
 
 void ACSCharacterPlayer::GASInputPressed(int32 InputId)
 {
+	if ( HasAuthority() )
+	{
+		HandleGASInputPressed(InputId);
+	}
+	else
+	{
+		ServerGASInputPressed(InputId);
+	}
+}
+
+void ACSCharacterPlayer::ServerGASInputPressed_Implementation(int32 InputId)
+{
+	HandleGASInputPressed(InputId);
+}
+
+void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
+{
+	if ( !ASC )
+	{
+		return;
+	}
+
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
@@ -315,6 +340,23 @@ void ACSCharacterPlayer::GASInputPressed(int32 InputId)
 
 void ACSCharacterPlayer::GASInputReleased(int32 InputId)
 {
+	if (HasAuthority())
+	{
+		HandleGASInputReleased(InputId);
+	}
+	else
+	{
+		ServerGASInputReleased(InputId);
+	}
+}
+
+void ACSCharacterPlayer::HandleGASInputReleased(int32 InputId)
+{
+	if ( !ASC )
+	{
+		return;
+	}
+
 	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
 	if (Spec)
 	{
@@ -324,6 +366,11 @@ void ACSCharacterPlayer::GASInputReleased(int32 InputId)
 			ASC->AbilitySpecInputReleased(*Spec);
 		}
 	}
+}
+
+void ACSCharacterPlayer::ServerGASInputReleased_Implementation(int32 InputId)
+{
+	HandleGASInputReleased(InputId);
 }
 
 void ACSCharacterPlayer::ClearWhiteHall()
