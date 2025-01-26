@@ -16,6 +16,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
+#include "Actor/CSGravityCore.h"
 #include "ChronoSpace.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -120,6 +121,9 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
+
+	OnActorBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnActorBeginOverlapCallback);
+	OnActorEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnActorEndOverlapCallback);
 }
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
@@ -186,6 +190,12 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if ( CurrentGravityCore )
+	{
+		FVector NewGravityDirection = CurrentGravityCore->GetGravityDirection(this);
+		GetCharacterMovement()->SetGravityDirection(NewGravityDirection);
+	}
+
 	if ( GetCharacterMovement()->Velocity.IsNearlyZero() )
 	{
 		return;
@@ -218,42 +228,56 @@ void ACSCharacterPlayer::SetDead()
 
 void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
-	if (nullptr != Cast<ACSCharacterPlayer>(OtherActor)) return;
+	UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap %s"), *OtherActor->GetName());
+	
 
-	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
-
-	if (OverlappedCharacter)
+	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor))
 	{
-		CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
+		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
 
-		UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap : %s"), *OtherActor->GetName());
-	}
+		if (OverlappedCharacter)
+		{
+			CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
+
+			UE_LOG(LogCS, Log, TEXT("OnTriggerBeginOverlap : %s"), *OtherActor->GetName());
+		}
+	}	
 }
 
 void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (nullptr != Cast<ACSCharacterPlayer>(OtherActor)) return;
-
-	ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
-
-	if (OverlappedCharacter)
+	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor))
 	{
-		CharsInPushing.Remove(OverlappedCharacter->GetFName());
+		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
+
+		if (OverlappedCharacter)
+		{
+			CharsInPushing.Remove(OverlappedCharacter->GetFName());
+		}
 	}
+}
+
+void ACSCharacterPlayer::OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if (ACSGravityCore* GravityCore = Cast<ACSGravityCore>(OtherActor))
+	{
+		CurrentGravityCore = GravityCore;
+		FVector NewGravityDirection = CurrentGravityCore->GetGravityDirection(this);
+		GravityDirectionStack.Push(NewGravityDirection);
+	}
+}
+
+void ACSCharacterPlayer::OnActorEndOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)
+{
+
 }
 
 void ACSCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
+	AddMovementInput( FollowCamera->GetForwardVector(), MovementVector.X);
+	AddMovementInput( FollowCamera->GetRightVector(), MovementVector.Y);
 }
 
 void ACSCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
