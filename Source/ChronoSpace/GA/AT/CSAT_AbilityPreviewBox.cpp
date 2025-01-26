@@ -122,12 +122,34 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
         return;
     }
 
+    // 허용된 크기 값 배열과 오프셋 매핑
+    TArray<float> AllowedSizes = { 50.0f, 100.0f, 150.0f, 200.0f, 250.0f, 300.0f, 350.0f, 400.0f, 450.0f, 500.0f };
+    TArray<float> YOffsets = { -150.0f, -100.0f, -50.0f, 0.0f, 50.0f,100.0f, 150.0f, 200.0f, 250.0f, 300.0f }; // 크기와 매칭되는 Y 오프셋
+
+    // PreviewBox 크기 가져오기
+    float CurrentSize = PreviewBox->GetUnscaledBoxExtent().X;
+
+    // 현재 크기에 해당하는 오프셋을 찾음
+    int32 CurrentIndex = AllowedSizes.IndexOfByPredicate([CurrentSize](float Size) {
+        return FMath::IsNearlyEqual(Size, CurrentSize, KINDA_SMALL_NUMBER);
+        });
+
+    float YOffset = 0.0f;
+    if (CurrentIndex != INDEX_NONE)
+    {
+        YOffset = YOffsets[CurrentIndex];
+    }
+
+    // 위치 계산
     FVector ForwardVector = AvatarActor->GetActorForwardVector();
     FVector ActorLocation = AvatarActor->GetActorLocation();
-    FVector PlayerOffSet(0.0f, 0.0f, 100.0f);
-    FVector NewLocation = ActorLocation + PlayerOffSet + ForwardVector * 350.0f;
+    FVector PlayerOffset(0.0f, -YOffset, 100.0f);
+    // FVector CenterOffset CurrentSize / 2.0f; // 박스 크기의 절반만큼 전진
+    FVector NewLocation = ActorLocation + PlayerOffset + ForwardVector * 350.0f;
 
     PreviewBox->SetWorldLocation(NewLocation);
+
+    UE_LOG(LogTemp, Log, TEXT("PlayerFollowPreviewBox updated: Location: X=%.2f, Y=%.2f, Z=%.2f, YOffset: %.2f"), NewLocation.X, NewLocation.Y, NewLocation.Z, YOffset);
 }
 
 void UCSAT_AbilityPreviewBox::TickTask(float DeltaTime)
