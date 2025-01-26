@@ -26,14 +26,22 @@ public:
     virtual void TickTask(float DeltaTime) override;
     virtual void OnDestroy(bool AbilityEnded) override;
 
-    FAbilityPreviewBoxLeftClick OnLeftClick;
-
-    FAbilityPreviewBoxRightClick OnRightClick;
+    FAbilityPreviewBoxLeftClick RunAbility;
+    FAbilityPreviewBoxRightClick StopAbility;
 
 protected:
     void SetSteticMeshMaterial(class UMaterial* Material, float Scale);
+
     void HandleLeftMouseClick();
     void HandleRightMouseClick();
+
+    void HandleWheelUp();
+    void HandleWheelDown();
+
+    void CreatePreviewBox();
+    void CreateStaticMesh();
+    void PlayerFollowPreviewBox();
+    void AdjustPreviewBoxScale(bool bIncrease);
 
 private:
     UPROPERTY()
@@ -46,5 +54,9 @@ private:
     TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 
     bool bIsAbilityPreviewActive = true; // Preview ป๓ลย
+    
+    float LastScrollTime = 0.0f;
+
+    //bool bIsScaled = false;
 
 };

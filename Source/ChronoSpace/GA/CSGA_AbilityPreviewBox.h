@@ -26,10 +26,11 @@ private:
 	void StopActivateTask();
 
 	UFUNCTION()
-	void HandleRightClick();
+	void RunAbility();
 
 	UFUNCTION()
-	void HandleLeftClick();
+	void StopAbility();
+	
 
 	UPROPERTY(EditAnywhere, Category = "Duration")
 	float DurationTime = 1.1f;
