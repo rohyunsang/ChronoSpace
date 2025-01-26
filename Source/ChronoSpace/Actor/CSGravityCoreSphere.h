@@ -21,7 +21,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sphere", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USphereComponent> SphereTrigger;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Sphere", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 
 	UPROPERTY(EditAnywhere, Category = "Sphere")

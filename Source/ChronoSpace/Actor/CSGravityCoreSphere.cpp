@@ -13,13 +13,13 @@ ACSGravityCoreSphere::ACSGravityCoreSphere()
 	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("GravitySphereTrigger"));
 	SphereTrigger->SetSphereRadius(GravityInfluenceRange, true);
 	SphereTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	SphereTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
 	RootComponent = SphereTrigger;
 
 	// Static Mesh
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	StaticMeshComp->SetupAttachment(SphereTrigger);
+	StaticMeshComp->SetCollisionProfileName(CPROFILE_CSCAPSULE);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/BlockSphere.BlockSphere'"));
 	if (StaticMeshRef.Object)
