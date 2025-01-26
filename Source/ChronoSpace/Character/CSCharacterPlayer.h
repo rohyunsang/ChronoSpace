@@ -44,12 +44,6 @@ protected:
 	UFUNCTION()
 	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION()
-	void OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor);
-
-	UFUNCTION()
-	void OnActorEndOverlapCallback(AActor* OverlappedActor, AActor* OtherActor);
-
 // Camera Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, Meta = (AllowPrivateAccess = "true"))
@@ -125,9 +119,6 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<class ACSWhiteHall> WhiteHall;
-
-	UPROPERTY()
-	TArray<FVector> GravityDirectionStack;
 
 	UPROPERTY()
 	TObjectPtr<class ACSGravityCore> CurrentGravityCore;

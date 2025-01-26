@@ -14,6 +14,17 @@ class CHRONOSPACE_API ACSGravityCore : public AActor
 public:	
 	ACSGravityCore();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	UFUNCTION(BlueprintCallable)
-	virtual FVector GetGravityDirection(AActor* Actor);
+	FVector GetGravityDirection(ACharacter* Character);
+
+protected:
+	UFUNCTION()
+	void OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void OnActorEndOverlapCallback(AActor* OverlappedActor, AActor* OtherActor);
+
+	TMap<FName, TObjectPtr<ACharacter>> TargetCharacters;
 };

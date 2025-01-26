@@ -17,8 +17,6 @@ class CHRONOSPACE_API ACSGravityCoreSphere : public ACSGravityCore
 public:
 	ACSGravityCoreSphere();
 
-	virtual FVector GetGravityDirection(AActor* Actor) override;
-
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sphere", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USphereComponent> SphereTrigger;

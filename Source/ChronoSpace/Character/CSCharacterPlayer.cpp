@@ -121,9 +121,6 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
-
-	OnActorBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnActorBeginOverlapCallback);
-	OnActorEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnActorEndOverlapCallback);
 }
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
@@ -190,12 +187,6 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if ( CurrentGravityCore )
-	{
-		FVector NewGravityDirection = CurrentGravityCore->GetGravityDirection(this);
-		GetCharacterMovement()->SetGravityDirection(NewGravityDirection);
-	}
-
 	if ( GetCharacterMovement()->Velocity.IsNearlyZero() )
 	{
 		return;
@@ -257,20 +248,6 @@ void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComp
 	}
 }
 
-void ACSCharacterPlayer::OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)
-{
-	if (ACSGravityCore* GravityCore = Cast<ACSGravityCore>(OtherActor))
-	{
-		CurrentGravityCore = GravityCore;
-		FVector NewGravityDirection = CurrentGravityCore->GetGravityDirection(this);
-		GravityDirectionStack.Push(NewGravityDirection);
-	}
-}
-
-void ACSCharacterPlayer::OnActorEndOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)
-{
-
-}
 
 void ACSCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {

@@ -28,15 +28,7 @@ ACSGravityCoreSphere::ACSGravityCoreSphere()
 	}
 
 	float MeshRadius = 50.0f;
-	float MeshScale = (GravityInfluenceRange / MeshRadius) * 0.85f;
+	float MeshScale = (GravityInfluenceRange / MeshRadius) * 0.75f;
 	StaticMeshComp->SetRelativeScale3D(FVector(MeshScale, MeshScale, MeshScale));
+
 }
-
-FVector ACSGravityCoreSphere::GetGravityDirection(AActor* Actor)
-{
-	FVector SelfLocation = GetActorLocation();
-	FVector TargetLocation = Actor->GetActorLocation();
-
-	return (SelfLocation - TargetLocation).GetSafeNormal();
-}
-
