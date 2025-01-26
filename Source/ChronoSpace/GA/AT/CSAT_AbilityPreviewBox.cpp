@@ -123,7 +123,6 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
     }
 
     // 허용된 크기 값 배열과 오프셋 매핑
-    TArray<float> AllowedSizes = { 50.0f, 100.0f, 150.0f, 200.0f, 250.0f, 300.0f, 350.0f, 400.0f, 450.0f, 500.0f };
     TArray<float> YOffsets = { -150.0f, -100.0f, -50.0f, 0.0f, 50.0f,100.0f, 150.0f, 200.0f, 250.0f, 300.0f }; // 크기와 매칭되는 Y 오프셋
 
     // PreviewBox 크기 가져오기
@@ -178,9 +177,6 @@ void UCSAT_AbilityPreviewBox::AdjustPreviewBoxScale(bool bIncrease)
         UE_LOG(LogTemp, Warning, TEXT("PreviewBox or StaticMeshComp is null during scale adjustment"));
         return;
     }
-
-    // 허용된 크기 값 배열
-    TArray<float> AllowedSizes = { 50.0f, 100.0f, 150.0f, 200.0f, 250.0f, 300.0f, 350.0f, 400.0f, 450.0f, 500.0f };
 
     // 현재 BoxExtent의 X 크기를 가져옵니다.
     float CurrentSize = PreviewBox->GetUnscaledBoxExtent().X;
