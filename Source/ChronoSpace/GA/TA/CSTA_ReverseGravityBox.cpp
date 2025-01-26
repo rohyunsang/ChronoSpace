@@ -12,6 +12,7 @@
 
 ACSTA_ReverseGravityBox::ACSTA_ReverseGravityBox()
 {
+    bReplicates = true;
     bShowDebug = false;
 
     // Trigger

@@ -9,17 +9,21 @@
 
 ACSGravityCoreSphere::ACSGravityCoreSphere()
 {
+	bReplicates = true;
+
 	// GravitySphereTrigger
 	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("GravitySphereTrigger"));
 	SphereTrigger->SetSphereRadius(GravityInfluenceRange, true);
 	SphereTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	RootComponent = SphereTrigger;
+	SphereTrigger->SetIsReplicated(true);
 
 	// Static Mesh
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	StaticMeshComp->SetupAttachment(SphereTrigger);
 	StaticMeshComp->SetCollisionProfileName(CPROFILE_CSCAPSULE);
+	StaticMeshComp->SetIsReplicated(true);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/BlockSphere.BlockSphere'"));
 	if (StaticMeshRef.Object)

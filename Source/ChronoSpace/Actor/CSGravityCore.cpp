@@ -8,6 +8,7 @@
 
 ACSGravityCore::ACSGravityCore()
 {
+	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 
 	OnActorBeginOverlap.AddDynamic(this, &ACSGravityCore::OnActorBeginOverlapCallback);

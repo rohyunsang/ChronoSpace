@@ -9,21 +9,25 @@
 
 ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 {
+    bReplicates = true;
+
 	// Trigger
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxTrigger"));
 	RootComponent = BoxTrigger;
 	BoxTrigger->SetBoxExtent(FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize));
 	BoxTrigger->SetRelativeLocation(FVector(350.0f, 0.0f, 100.0f));
 	BoxTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
+    BoxTrigger->SetIsReplicated(true);
 
 	// 오버랩 이벤트 서브 클래스에서 추가 필요
-	//BoxTrigger->OnComponentBeginOverlap.BoxTrigger(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
-	//BoxTrigger->OnComponentEndOverlap.BoxTrigger(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
+	//BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
+	//BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
 
     // Static Mesh
     StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
     StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     StaticMeshComp->SetupAttachment(BoxTrigger);
+    StaticMeshComp->SetIsReplicated(true);
     
     static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/SM_Cube.SM_Cube'"));
     if ( StaticMeshRef.Object )

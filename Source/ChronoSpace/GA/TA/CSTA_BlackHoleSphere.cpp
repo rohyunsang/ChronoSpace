@@ -16,6 +16,7 @@
 
 ACSTA_BlackHoleSphere::ACSTA_BlackHoleSphere()
 {
+	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true; 
 
 	// GravitySphereTrigger
@@ -24,6 +25,7 @@ ACSTA_BlackHoleSphere::ACSTA_BlackHoleSphere()
 	GravitySphereTrigger->SetSphereRadius(GravityInfluenceRange, true);
 	GravitySphereTrigger->SetRelativeLocation(FVector(600.0f, 0.0f, 200.0f));
 	GravitySphereTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
+	GravitySphereTrigger->SetIsReplicated(true);
 
 	GravitySphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_BlackHoleSphere::OnTriggerBeginOverlap);
 	GravitySphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_BlackHoleSphere::OnTriggerEndOverlap);
@@ -34,13 +36,14 @@ ACSTA_BlackHoleSphere::ACSTA_BlackHoleSphere()
 	EventHorizonSphereTrigger->SetSphereRadius(EventHorizonRadius, true);
 	EventHorizonSphereTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	EventHorizonSphereTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
-
+	EventHorizonSphereTrigger->SetIsReplicated(true);
 	EventHorizonSphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_BlackHoleSphere::OnEventHorizonBeginOverlap); 
 
 	// Static Mesh
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	StaticMeshComp->SetupAttachment(GravitySphereTrigger);
+	StaticMeshComp->SetIsReplicated(true);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/MaterialSphere.MaterialSphere'"));
 	if (StaticMeshRef.Object)

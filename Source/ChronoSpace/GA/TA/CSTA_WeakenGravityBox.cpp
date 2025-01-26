@@ -13,6 +13,7 @@
 
 ACSTA_WeakenGravityBox::ACSTA_WeakenGravityBox()
 {
+    bReplicates = true;
     bShowDebug = false;
 
     // Trigger

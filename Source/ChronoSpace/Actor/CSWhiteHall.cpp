@@ -7,8 +7,11 @@
 // Sets default values
 ACSWhiteHall::ACSWhiteHall()
 {
+	bReplicates = true;
+
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	RootComponent = StaticMeshComp;
+	StaticMeshComp->SetIsReplicated(true);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/MaterialSphere.MaterialSphere'"));
 	if (StaticMeshRef.Object)
