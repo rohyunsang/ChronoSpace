@@ -6,6 +6,9 @@
 #include "GA/AT/CSAT_DurationTask.h"
 #include "CSAT_AbilityPreviewBox.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityPreviewBoxLeftClick);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityPreviewBoxRightClick);
+
 /**
  * 
  */
@@ -22,6 +25,10 @@ public:
     virtual void Activate() override;
     virtual void TickTask(float DeltaTime) override;
     virtual void OnDestroy(bool AbilityEnded) override;
+
+    FAbilityPreviewBoxLeftClick OnLeftClick;
+
+    FAbilityPreviewBoxRightClick OnRightClick;
 
 protected:
     void SetSteticMeshMaterial(class UMaterial* Material, float Scale);

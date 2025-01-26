@@ -3,6 +3,9 @@
 
 #include "GA/CSGA_AbilityPreviewBox.h"
 #include "GA/AT/CSAT_AbilityPreviewBox.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
+#include "GA/CSGA_ChronoControl.h"
 
 
 UCSGA_AbilityPreviewBox::UCSGA_AbilityPreviewBox()
@@ -12,6 +15,8 @@ UCSGA_AbilityPreviewBox::UCSGA_AbilityPreviewBox()
 
 void UCSGA_AbilityPreviewBox::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogTemp, Log, TEXT("ActivateAiblity"));
+
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	ActivateTask();
@@ -21,8 +26,35 @@ void UCSGA_AbilityPreviewBox::ActivateTask()
 {
 	UCSAT_AbilityPreviewBox* BoxTask = UCSAT_AbilityPreviewBox::CreateTask(this);
 	BoxTask->SetDurtionTime(DurationTime);
-	BoxTask->OnComplete.AddDynamic(this, &UCSGA_AbilityPreviewBox::StopActivateTask);
+	// BoxTask->OnComplete.AddDynamic(this, &UCSGA_AbilityPreviewBox::StopActivateTask);
+	BoxTask->OnLeftClick.AddDynamic(this, &UCSGA_AbilityPreviewBox::HandleLeftClick);
+
+	// 우클릭: 종료만 처리
+	BoxTask->OnRightClick.AddDynamic(this, &UCSGA_AbilityPreviewBox::HandleRightClick);
+
 	BoxTask->ReadyForActivation();
+}
+
+void UCSGA_AbilityPreviewBox::HandleLeftClick()
+{
+	// 새로운 어빌리티 실행
+	if (CurrentActorInfo->AbilitySystemComponent.IsValid())
+	{
+		UAbilitySystemComponent* ASC = CurrentActorInfo->AbilitySystemComponent.Get();
+		FGameplayAbilitySpec* NewAbilitySpec = ASC->FindAbilitySpecFromClass(UCSGA_ChronoControl::StaticClass());
+		if (NewAbilitySpec)
+		{
+			ASC->TryActivateAbility(NewAbilitySpec->Handle); // 새로운 어빌리티 실행
+		}
+	}
+
+	StopActivateTask(); // 부모 어빌리티 종료 처리
+}
+
+void UCSGA_AbilityPreviewBox::HandleRightClick()
+{
+	// 단순 종료 처리
+	StopActivateTask();
 }
 
 void UCSGA_AbilityPreviewBox::StopActivateTask()

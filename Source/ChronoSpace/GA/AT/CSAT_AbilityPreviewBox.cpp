@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GA/AT/CSAT_AbilityPreviewBox.h"
+#include "GA/CSGA_AbilityPreviewBox.h"
 #include "GA/CSGA_ChronoControl.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -93,7 +94,14 @@ void UCSAT_AbilityPreviewBox::Activate()
 
 void UCSAT_AbilityPreviewBox::TickTask(float DeltaTime)
 {
+
     Super::TickTask(DeltaTime);
+
+    if (!PreviewBox || !StaticMeshComp || !Ability || !Ability->GetCurrentActorInfo())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("PreviewBox or StaticMeshComp or Ability is null"));
+        return; // 유효하지 않은 경우 Tick 종료
+    }
 
     // 플레이어의 앞을 따라다니게 설정
     if (Ability && Ability->GetCurrentActorInfo()->AvatarActor.IsValid())
@@ -101,10 +109,10 @@ void UCSAT_AbilityPreviewBox::TickTask(float DeltaTime)
         AActor* AvatarActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
         FVector ForwardVector = AvatarActor->GetActorForwardVector();
         FVector ActorLocation = AvatarActor->GetActorLocation();
-        UE_LOG(LogTemp, Log, TEXT("Player Location: X=%.2f, Y=%.2f, Z=%.2f"), ActorLocation.X, ActorLocation.Y, ActorLocation.Z);
+        //UE_LOG(LogTemp, Log, TEXT("Player Location: X=%.2f, Y=%.2f, Z=%.2f"), ActorLocation.X, ActorLocation.Y, ActorLocation.Z);
         FVector PlayerOffSet(0.0f, 0.0f, 100.0f);
         FVector NewLocation = ActorLocation + PlayerOffSet + ForwardVector * 350.0f ;
-        UE_LOG(LogTemp, Log, TEXT("NewLocation NewLocation: X=%.2f, Y=%.2f, Z=%.2f"), NewLocation.X, NewLocation.Y, NewLocation.Z);
+        UE_LOG(LogTemp, Log, TEXT("Is Run Tick Task"));
 
         PreviewBox->SetWorldLocation(NewLocation);
     }
@@ -113,52 +121,46 @@ void UCSAT_AbilityPreviewBox::TickTask(float DeltaTime)
     if (Ability->GetCurrentActorInfo()->PlayerController->IsInputKeyDown(EKeys::LeftMouseButton))
     {
         HandleLeftMouseClick();
+        return;
     }
     if (Ability->GetCurrentActorInfo()->PlayerController->IsInputKeyDown(EKeys::RightMouseButton))
     {
         HandleRightMouseClick();
+        return;
     }
 }
 
 
 
-void UCSAT_AbilityPreviewBox::HandleLeftMouseClick()
+void UCSAT_AbilityPreviewBox::HandleLeftMouseClick()   // 새로운 어빌리티 시작.
 {
-    if (Ability && Ability->GetCurrentActorInfo()->AbilitySystemComponent.IsValid())
-    {
-        UAbilitySystemComponent* ASC = Ability->GetCurrentActorInfo()->AbilitySystemComponent.Get();
-        if (ASC)
-        {
-            // 클래스 기반으로 FGameplayAbilitySpec을 찾음
-            FGameplayAbilitySpec* AbilitySpec = ASC->FindAbilitySpecFromClass(UCSGA_ChronoControl::StaticClass());
-            if (AbilitySpec)
-            {
-                // 스펙 핸들을 사용하여 어빌리티 실행
-                ASC->TryActivateAbility(AbilitySpec->Handle);
-            }
-        }
-    }
+    OnLeftClick.Broadcast();
+    EndTask();
 }
 
-void UCSAT_AbilityPreviewBox::HandleRightMouseClick()
+void UCSAT_AbilityPreviewBox::HandleRightMouseClick()  // 어빌리티 실행 취소 
 {
     // 종료 처리
+    OnRightClick.Broadcast();
     EndTask();
 }
 
 void UCSAT_AbilityPreviewBox::OnDestroy(bool AbilityEnded)
 {
-    Super::OnDestroy(AbilityEnded);
-
     if (PreviewBox)
     {
         PreviewBox->DestroyComponent();
+        PreviewBox = nullptr; // Null로 설정하여 다시 생성되도록 함
     }
 
     if (StaticMeshComp)
     {
         StaticMeshComp->DestroyComponent();
+        StaticMeshComp = nullptr; // Null로 설정하여 다시 생성되도록 함
     }
-
+    
     UE_LOG(LogTemp, Log, TEXT("UCSAT_AbilityPreviewBox destroyed"));
+
+    Super::OnDestroy(AbilityEnded);
 }
+

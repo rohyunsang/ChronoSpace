@@ -31,6 +31,7 @@ protected:
 	virtual void SpawnAndInitializeTargetActor() {};
 	virtual void FinalizeTargetActor() {};
 	virtual void EndTargetActor() {};
+	
 
 	UPROPERTY()
 	TSubclassOf<class AGameplayAbilityTargetActor> TargetActorClass;
