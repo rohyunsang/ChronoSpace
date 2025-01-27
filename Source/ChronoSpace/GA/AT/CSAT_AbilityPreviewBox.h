@@ -6,7 +6,7 @@
 #include "GA/AT/CSAT_DurationTask.h"
 #include "CSAT_AbilityPreviewBox.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityPreviewBoxLeftClick);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityPreviewBoxLeftClick, float, BoxSize);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityPreviewBoxRightClick);
 
 /**

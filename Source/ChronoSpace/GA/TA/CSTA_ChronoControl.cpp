@@ -85,7 +85,7 @@ void ACSTA_ChronoControl::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedC
         DetectedCharacter->CustomTimeDilation = 0.0f;
 
         ActorsInBoxTrigger.Emplace(OtherActor->GetFName(), OtherActor);
-    }
+    } 
 }
 
 void ACSTA_ChronoControl::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

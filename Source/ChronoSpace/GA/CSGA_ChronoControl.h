@@ -16,6 +16,7 @@ class CHRONOSPACE_API UCSGA_ChronoControl : public UGameplayAbility
 	
 public:
 	UCSGA_ChronoControl();
+	UCSGA_ChronoControl(float BoxSize);
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	FORCEINLINE const float GetDurationTime() const { return DurationTime; }

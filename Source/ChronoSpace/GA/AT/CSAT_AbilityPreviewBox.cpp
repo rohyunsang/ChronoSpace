@@ -55,8 +55,6 @@ void UCSAT_AbilityPreviewBox::Activate()
             PlayerController->InputComponent->BindAction("WheelDown", IE_Pressed, this, &UCSAT_AbilityPreviewBox::HandleWheelDown);
         }
     }
-    
-
     UE_LOG(LogTemp, Log, TEXT("PreviewBox and StaticMeshComp created dynamically with material"));
 }
 void UCSAT_AbilityPreviewBox::CreatePreviewBox()
@@ -123,7 +121,7 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
     }
 
     // 허용된 크기 값 배열과 오프셋 매핑
-    TArray<float> YOffsets = { -150.0f, -100.0f, -50.0f, 0.0f, 50.0f,100.0f, 150.0f, 200.0f, 250.0f, 300.0f }; // 크기와 매칭되는 Y 오프셋
+    TArray<float> YOffsets = { 150.0f, 100.0f, 50.0f, 0.0f, -50.0f, -100.0f, -150.0f, -200.0f, -250.0f, -300.0f };
 
     // PreviewBox 크기 가져오기
     float CurrentSize = PreviewBox->GetUnscaledBoxExtent().X;
@@ -141,14 +139,24 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
 
     // 위치 계산
     FVector ForwardVector = AvatarActor->GetActorForwardVector();
+    FVector RightVector = AvatarActor->GetActorRightVector(); // 플레이어의 오른쪽 방향 벡터
     FVector ActorLocation = AvatarActor->GetActorLocation();
-    FVector PlayerOffset(0.0f, -YOffset, 100.0f);
-    // FVector CenterOffset CurrentSize / 2.0f; // 박스 크기의 절반만큼 전진
-    FVector NewLocation = ActorLocation + PlayerOffset + ForwardVector * 350.0f;
 
+    // ForwardVector와 RightVector를 기반으로 PlayerOffset 계산
+    FVector ForwardOffset = ForwardVector * 350.0f; // 플레이어 앞 방향으로 350 단위
+    FVector RightOffset = RightVector * YOffset;   // 오른쪽 방향으로 YOffset 만큼 이동
+    FVector UpOffset(0.0f, 0.0f, 100.0f);          // 위쪽으로 100 단위
+
+    FVector NewLocation = ActorLocation + ForwardOffset + RightOffset + UpOffset;
+
+    // 박스 위치 업데이트
     PreviewBox->SetWorldLocation(NewLocation);
 
-    UE_LOG(LogTemp, Log, TEXT("PlayerFollowPreviewBox updated: Location: X=%.2f, Y=%.2f, Z=%.2f, YOffset: %.2f"), NewLocation.X, NewLocation.Y, NewLocation.Z, YOffset);
+    // 디버그 로그
+    //UE_LOG(LogTemp, Log, TEXT("ActorLocation: X=%.2f, Y=%.2f, Z=%.2f"), ActorLocation.X, ActorLocation.Y, ActorLocation.Z);
+    //UE_LOG(LogTemp, Log, TEXT("ForwardOffset: X=%.2f, Y=%.2f, Z=%.2f"), ForwardOffset.X, ForwardOffset.Y, ForwardOffset.Z);
+    //UE_LOG(LogTemp, Log, TEXT("RightOffset: X=%.2f, Y=%.2f, Z=%.2f"), RightOffset.X, RightOffset.Y, RightOffset.Z);
+    //UE_LOG(LogTemp, Log, TEXT("NewLocation: X=%.2f, Y=%.2f, Z=%.2f, YOffset: %.2f"), NewLocation.X, NewLocation.Y, NewLocation.Z, YOffset);
 }
 
 void UCSAT_AbilityPreviewBox::TickTask(float DeltaTime)
@@ -212,9 +220,10 @@ void UCSAT_AbilityPreviewBox::AdjustPreviewBoxScale(bool bIncrease)
     UE_LOG(LogTemp, Log, TEXT("PreviewBox Adjusted Extent: X=%.2f, Y=%.2f, Z=%.2f"), NewExtent.X, NewExtent.Y, NewExtent.Z);
 }
 
-void UCSAT_AbilityPreviewBox::HandleLeftMouseClick()   // 새로운 어빌리티 시작.
+void UCSAT_AbilityPreviewBox::HandleLeftMouseClick()   // 새로운 어빌리티 시작
 {
-    RunAbility.Broadcast();
+    float CurrentBoxSize = PreviewBox->GetUnscaledBoxExtent().X; // 현재 박스 크기
+    RunAbility.Broadcast(CurrentBoxSize); // 현재 박스 크기를 매개변수로 전달
     EndTask();
 }
 

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
 #include "GA/CSGA_ChronoControl.h"
+#include "DataAsset/CSDA_BoxProperties.h"
 
 
 UCSGA_AbilityPreviewBox::UCSGA_AbilityPreviewBox()
@@ -33,8 +34,30 @@ void UCSGA_AbilityPreviewBox::ActivateTask()
 	BoxTask->ReadyForActivation();
 }
 
-void UCSGA_AbilityPreviewBox::RunAbility()
+void UCSGA_AbilityPreviewBox::RunAbility(float BoxSize)
 {
+	// /Script/ChronoSpace.CSDA_BoxProperties'/Game/DataAssets/CSDA_BoxProperties.CSDA_BoxProperties'
+
+	// 데이터 에셋 경로
+	const FString AssetPath = TEXT("/Game/DataAssets/CSDA_BoxProperties.CSDA_BoxProperties");
+	UCSDA_BoxProperties* BoxPropertiesAsset = Cast<UCSDA_BoxProperties>(StaticLoadObject(UCSDA_BoxProperties::StaticClass(), nullptr, *AssetPath));
+
+	if (BoxPropertiesAsset)
+	{
+		// BoxSize 설정
+		BoxPropertiesAsset->BoxSize = BoxSize;
+		UE_LOG(LogTemp, Log, TEXT("Successfully updated BoxSize in DataAsset to: %f"), BoxSize);
+
+		// 변경 사항 저장 (에디터에서만 가능)
+#if WITH_EDITOR
+		BoxPropertiesAsset->MarkPackageDirty();
+#endif
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to load BoxPropertiesDataAsset at path: %s"), *AssetPath);
+	}
+
 	// 새로운 어빌리티 실행
 	if (CurrentActorInfo->AbilitySystemComponent.IsValid())
 	{

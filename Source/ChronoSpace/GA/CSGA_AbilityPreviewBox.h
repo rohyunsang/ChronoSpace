@@ -26,7 +26,7 @@ private:
 	void StopActivateTask();
 
 	UFUNCTION()
-	void RunAbility();
+	void RunAbility(float BoxSize);
 
 	UFUNCTION()
 	void StopAbility();

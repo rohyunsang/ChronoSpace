@@ -5,10 +5,28 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Physics/CSCollision.h"
+#include "DataAsset/CSDA_BoxProperties.h"
 #include "ChronoSpace.h"
 
 ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 {
+    // 데이터 에셋 경로
+    const FString AssetPath = TEXT("/Game/DataAssets/CSDA_BoxProperties.CSDA_BoxProperties");
+    UCSDA_BoxProperties* BoxPropertiesAsset = Cast<UCSDA_BoxProperties>(StaticLoadObject(UCSDA_BoxProperties::StaticClass(), nullptr, *AssetPath));
+    
+    BoxExtentSize = 200.0f; // default value
+
+    if (BoxPropertiesAsset)
+    {
+        BoxExtentSize = BoxPropertiesAsset->BoxSize; // 데이터 에셋에서 BoxSize 가져오기
+        UE_LOG(LogTemp, Log, TEXT("BoxExtentSize loaded from DataAsset: %f"), BoxExtentSize);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load CSDA_BoxProperties at path: %s"), *AssetPath);
+    }
+
+
 	// Trigger
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxTrigger"));
 	RootComponent = BoxTrigger;
