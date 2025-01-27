@@ -57,6 +57,8 @@ void UCSAT_AbilityPreviewBox::Activate()
     }
     UE_LOG(LogTemp, Log, TEXT("PreviewBox and StaticMeshComp created dynamically with material"));
 }
+
+
 void UCSAT_AbilityPreviewBox::CreatePreviewBox()
 {
     PreviewBox = NewObject<UBoxComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
