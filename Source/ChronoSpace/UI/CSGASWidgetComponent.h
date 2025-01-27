@@ -13,6 +13,10 @@ UCLASS()
 class CHRONOSPACE_API UCSGASWidgetComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
+
+public:
+	void ActivateGAS();
+
 protected:
 	virtual void InitWidget() override;
 };

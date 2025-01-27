@@ -4,6 +4,7 @@
 #include "Character/CSCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "UI/CSGASEnergyBarUserWidget.h"
 #include "Physics/CSCollision.h"
 
 // Sets default values

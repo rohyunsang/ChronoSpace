@@ -15,8 +15,8 @@ class CHRONOSPACE_API UCSGASUserWidget : public UUserWidget, public IAbilitySyst
 {
 	GENERATED_BODY()
 	
-
 public:
+	virtual void SetOwner(AActor* InOwner);
 	virtual void SetAbilitySystemComponent(AActor* InOwner);
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -24,4 +24,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
 
+	UPROPERTY()
+	TObjectPtr<AActor> Owner;
 };

@@ -17,6 +17,7 @@
 #include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
 #include "Actor/CSGravityCore.h"
+#include "UI/CSGASUserWidget.h"
 #include "ChronoSpace.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -92,6 +93,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
 	EnergyBar->SetupAttachment(GetMesh());
 	EnergyBar->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	
 	//static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/ArenaBattle/UI/WBP_HpBar.WBP_HpBar_C"));
 	static ConstructorHelpers::FClassFinder<UUserWidget> EnergyBarWidgetRef(TEXT("/Game/Blueprint/UI/BP_EnergyBar.BP_EnergyBar_C"));
 	if (EnergyBarWidgetRef.Class)
@@ -133,7 +135,8 @@ void ACSCharacterPlayer::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] PossessedBy"), GetWorld()->GetNetMode());
 	SetASC();
-	
+
+	EnergyBar->ActivateGAS();
 }
 
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -150,14 +153,35 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	SetupGASInputComponent();
 }
 
+void ACSCharacterPlayer::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
+	if (CSPS)
+	{
+		ASC = CSPS->GetAbilitySystemComponent();
+		UE_LOG(LogCS, Log, TEXT("[NetMode %d] OnRep_PlayerState - ASC Is Found!"), GetWorld()->GetNetMode());
+	}
+	else
+	{
+		UE_LOG(LogCS, Log, TEXT("[NetMode %d] OnRep_PlayerState - ASC Not Found"), GetWorld()->GetNetMode());
+	}
+}
+
 void ACSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
-	
-	// 이 밑으론 로컬 컨트롤러만 진입 가능
-	if (!IsLocallyControlled()) return;
 
+	EnergyBar->ActivateGAS();
+	
+	if (!IsLocallyControlled())
+	{
+		EnergyBar->SetVisibility(false);
+		return;
+	}
+	// 이 밑으론 로컬 컨트롤러만 진입 가능
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) 
 	{
@@ -222,7 +246,7 @@ void ACSCharacterPlayer::SetASC()
 			ASC->GiveAbility(StartSpec);
 		}
 
-		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
+		//UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
 	}
 	else
 	{
@@ -275,7 +299,7 @@ void ACSCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 void ACSCharacterPlayer::SetupGASInputComponent()
 {
-	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] SetupGASInputComponent Start"), GetWorld()->GetNetMode());
+	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] SetupGASInputComponent Start"), GetWorld()->GetNetMode());
 	if (IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
@@ -289,7 +313,7 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity10P);
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity50P);
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity50P);
-		UE_LOG(LogCS, Log, TEXT("SetupGASInputComponent Succeed"));
+		//UE_LOG(LogCS, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
 	else
 	{
@@ -325,7 +349,7 @@ void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
 	if (Spec)
 	{
 		if (Spec->InputPressed) return;
-		UE_LOG(LogCS, Log, TEXT("GASInputPressed"));
+		//UE_LOG(LogCS, Log, TEXT("GASInputPressed"));
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{

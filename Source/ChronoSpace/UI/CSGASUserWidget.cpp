@@ -4,6 +4,14 @@
 #include "UI/CSGASUserWidget.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
+void UCSGASUserWidget::SetOwner(AActor* InOwner)
+{
+	if (IsValid(InOwner))
+	{
+		Owner = InOwner;
+	}
+}
+
 void UCSGASUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 {
 	if (IsValid(InOwner))
