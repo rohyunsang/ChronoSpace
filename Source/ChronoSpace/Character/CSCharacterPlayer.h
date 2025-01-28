@@ -40,8 +40,6 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetDead() override;
 
-	void SetASC();
-
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
 	
@@ -110,7 +108,8 @@ protected:
 	void HandleGASInputReleased(int32 InputId);
 	// ********************************************************
 
-
+	void SetASC();
+	void SetGASAbilities();
 
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;

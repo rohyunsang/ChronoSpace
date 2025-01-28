@@ -17,11 +17,12 @@
 #include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
 #include "Actor/CSGravityCore.h"
-#include "UI/CSGASUserWidget.h"
 #include "ChronoSpace.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
+	bReplicates = true;
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Camera
@@ -133,10 +134,9 @@ UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 void ACSCharacterPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] PossessedBy"), GetWorld()->GetNetMode());
+	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] PossessedBy"), GetWorld()->GetNetMode());
 	SetASC();
-
-	EnergyBar->ActivateGAS();
+	SetGASAbilities();
 }
 
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -157,16 +157,8 @@ void ACSCharacterPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
-	if (CSPS)
-	{
-		ASC = CSPS->GetAbilitySystemComponent();
-		UE_LOG(LogCS, Log, TEXT("[NetMode %d] OnRep_PlayerState - ASC Is Found!"), GetWorld()->GetNetMode());
-	}
-	else
-	{
-		UE_LOG(LogCS, Log, TEXT("[NetMode %d] OnRep_PlayerState - ASC Not Found"), GetWorld()->GetNetMode());
-	}
+	SetASC();
+	EnergyBar->ActivateGAS();
 }
 
 void ACSCharacterPlayer::BeginPlay()
@@ -174,13 +166,17 @@ void ACSCharacterPlayer::BeginPlay()
 	Super::BeginPlay();
 	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
 
-	EnergyBar->ActivateGAS();
+	if ( HasAuthority() )
+	{
+		EnergyBar->ActivateGAS();
+	}
 	
 	if (!IsLocallyControlled())
 	{
-		EnergyBar->SetVisibility(false);
+		//EnergyBar->SetVisibility(false);
 		return;
 	}
+
 	// 이 밑으론 로컬 컨트롤러만 진입 가능
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) 
@@ -227,12 +223,24 @@ void ACSCharacterPlayer::SetDead()
 
 void ACSCharacterPlayer::SetASC()
 {
+	if (ASC) return;
 	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
 	if (CSPS)
 	{
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
+		//UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - ASC Not Found"), GetWorld()->GetNetMode());
+	}
+}
 
+void ACSCharacterPlayer::SetGASAbilities()
+{
+	if ( ASC )
+	{
 		for (const auto& StartAbility : StartAbilities)
 		{
 			FGameplayAbilitySpec StartSpec(StartAbility);
@@ -245,12 +253,6 @@ void ACSCharacterPlayer::SetASC()
 			StartSpec.InputID = StartInputAbility.Key;
 			ASC->GiveAbility(StartSpec);
 		}
-
-		//UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
-	}
-	else
-	{
-		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - ASC Not Found"), GetWorld()->GetNetMode());
 	}
 }
 
