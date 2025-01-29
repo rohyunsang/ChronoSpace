@@ -8,6 +8,7 @@
 
 UCSGA_ReverseGravity::UCSGA_ReverseGravity()
 {
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 

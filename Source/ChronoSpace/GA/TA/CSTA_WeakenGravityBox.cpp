@@ -27,13 +27,18 @@ ACSTA_WeakenGravityBox::ACSTA_WeakenGravityBox()
 void ACSTA_WeakenGravityBox::BeginPlay()
 {
     Super::BeginPlay();
-    SaturationSetting();
+    if ( HasAuthority() )
+    {
+        UE_LOG(LogCS, Log, TEXT("[NetMode : %d]ACSTA_WeakenGravityBox - BeginPlay"), GetWorld()->GetNetMode());
+        SaturationSetting();
+    }
 }
 
 void ACSTA_WeakenGravityBox::StartTargeting(UGameplayAbility* Ability)
 {
     Super::StartTargeting(Ability);
     SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
+    
 }
 
 void ACSTA_WeakenGravityBox::ConfirmTargetingAndContinue()
@@ -89,8 +94,19 @@ void ACSTA_WeakenGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlapped
     }
 }
 
+void ACSTA_WeakenGravityBox::NetMulticastSaturationSetting_Implementation() 
+{
+    HandleSaturationSetting(); 
+}
+
 void ACSTA_WeakenGravityBox::SaturationSetting()
 {
+    NetMulticastSaturationSetting();
+}
+
+void ACSTA_WeakenGravityBox::HandleSaturationSetting()
+{
+    UE_LOG(LogCS, Log, TEXT("[NetMode : %d] HandleSaturationSetting, %f"), GetWorld()->GetNetMode(), GravityCoef);
     UMaterialInstanceDynamic* DynMaterial = Cast<UMaterialInstanceDynamic>(StaticMeshComp->GetMaterial(0));
     FLinearColor OrgColor;
     DynMaterial->GetVectorParameterValue(FName(TEXT("Color")), OrgColor);

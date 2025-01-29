@@ -44,6 +44,7 @@ void UCSAT_BlackHoleSphere::SpawnAndInitializeTargetActor()
 	
 	if (SpawnedTargetActor)
 	{
+		SpawnedTargetActor->SetOwner(GetOwnerActor()); 
 		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_BlackHoleSphere::OnTargetActorReadyCallback);
 	}
 }

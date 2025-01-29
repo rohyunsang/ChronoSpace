@@ -42,6 +42,7 @@ void UCSAT_WeakenGravityBox::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ACSTA_WeakenGravityBox>(GetWorld()->SpawnActorDeferred<ACSTA_WeakenGravityBox>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
+		SpawnedTargetActor->SetOwner(GetOwnerActor());
 		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_WeakenGravityBox::OnTargetActorReadyCallback);
 		SpawnedTargetActor->SetGravityCoef(GravityCoef);
 	}

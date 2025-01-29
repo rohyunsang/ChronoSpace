@@ -8,6 +8,7 @@
 
 UCSGA_WeakenGravity::UCSGA_WeakenGravity()
 {
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 

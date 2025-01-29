@@ -41,6 +41,7 @@ void UCSAT_ReverseGravityTrace::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ACSTA_ReverseGravityTrace>(GetWorld()->SpawnActorDeferred<ACSTA_ReverseGravityTrace>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
+		SpawnedTargetActor->SetOwner(GetOwnerActor());
 		SpawnedTargetActor->SetShowDebug(true);
 		SpawnedTargetActor->TargetDataReadyDelegate.AddUObject(this, &UCSAT_ReverseGravityTrace::OnTargetDataReadyCallback);
 	}

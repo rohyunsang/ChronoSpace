@@ -23,6 +23,7 @@ void UCSAT_ReverseGravityBox::SpawnAndInitializeTargetActor()
 	SpawnedTargetActor = Cast<ACSTA_ReverseGravityBox>(GetWorld()->SpawnActorDeferred<ACSTA_ReverseGravityBox>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
+		SpawnedTargetActor->SetOwner(GetOwnerActor());
 		SpawnedTargetActor->OnComplete.AddDynamic(this, &UCSAT_ReverseGravityBox::OnTargetActorReadyCallback);
 	}
 }

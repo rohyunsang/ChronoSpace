@@ -11,6 +11,7 @@
 
 UCSGA_BlackHole::UCSGA_BlackHole()
 {
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 

@@ -21,7 +21,7 @@
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
-	bReplicates = true;
+	//bReplicates = true;
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -142,7 +142,7 @@ void ACSCharacterPlayer::PossessedBy(AController* NewController)
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetupPlayerInputComponent"), GetWorld()->GetNetMode());
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
@@ -156,9 +156,11 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ACSCharacterPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+	// UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] OnRep_PlayerState, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 
 	SetASC();
 	EnergyBar->ActivateGAS();
+	// UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] OnRep_PlayerState, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 }
 
 void ACSCharacterPlayer::BeginPlay()
@@ -224,12 +226,13 @@ void ACSCharacterPlayer::SetDead()
 void ACSCharacterPlayer::SetASC()
 {
 	if (ASC) return;
+
 	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
 	if (CSPS)
 	{
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
-		//UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - Success : %s"), GetWorld()->GetNetMode(), *GetName());
+		UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 	}
 	else
 	{
@@ -286,7 +289,7 @@ void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComp
 void ACSCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	//UE_LOG(LogCS, Log, TEXT("[NetMode %d] ShoulderMove"), GetWorld()->GetNetMode());
 	AddMovementInput( FollowCamera->GetForwardVector(), MovementVector.X);
 	AddMovementInput( FollowCamera->GetRightVector(), MovementVector.Y);
 }
@@ -325,19 +328,26 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 
 void ACSCharacterPlayer::GASInputPressed(int32 InputId)
 {
+	
 	if ( HasAuthority() )
 	{
+		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], GASInputPressed"), GetWorld()->GetNetMode());
 		HandleGASInputPressed(InputId);
 	}
 	else
 	{
+		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], GASInputPressed"), GetWorld()->GetNetMode());
 		ServerGASInputPressed(InputId);
 	}
 }
 
 void ACSCharacterPlayer::ServerGASInputPressed_Implementation(int32 InputId)
 {
-	HandleGASInputPressed(InputId);
+	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], ServerGASInputPressed_Implementation"), GetWorld()->GetNetMode());
+	if ( HasAuthority() )
+	{
+		HandleGASInputPressed(InputId);
+	}
 }
 
 void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
@@ -351,7 +361,7 @@ void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
 	if (Spec)
 	{
 		if (Spec->InputPressed) return;
-		//UE_LOG(LogCS, Log, TEXT("GASInputPressed"));
+		UE_LOG(LogCS, Log, TEXT("[NetMode : %d], HandleGASInputPressed"), GetWorld()->GetNetMode());
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{
