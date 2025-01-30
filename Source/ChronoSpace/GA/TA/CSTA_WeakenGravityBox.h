@@ -33,10 +33,10 @@ protected:
 	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticastSaturationSetting();
+	void NetMulticastSaturationSetting(float InGravityCoef);
 
 	void SaturationSetting();
-	void HandleSaturationSetting();
+	void HandleSaturationSetting(float InGravityCoef);
 
 	UPROPERTY(EditAnywhere, Category = "GravityCoef")
 	float GravityCoef = 0.1f;

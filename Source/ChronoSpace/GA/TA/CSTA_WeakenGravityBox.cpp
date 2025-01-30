@@ -94,17 +94,20 @@ void ACSTA_WeakenGravityBox::OnTriggerEndOverlap(UPrimitiveComponent* Overlapped
     }
 }
 
-void ACSTA_WeakenGravityBox::NetMulticastSaturationSetting_Implementation() 
+void ACSTA_WeakenGravityBox::NetMulticastSaturationSetting_Implementation(float InGravityCoef)
 {
-    HandleSaturationSetting(); 
+    HandleSaturationSetting(InGravityCoef);
 }
 
 void ACSTA_WeakenGravityBox::SaturationSetting()
 {
-    NetMulticastSaturationSetting();
+    if ( HasAuthority() )
+    {
+        NetMulticastSaturationSetting(GravityCoef);
+    }
 }
 
-void ACSTA_WeakenGravityBox::HandleSaturationSetting()
+void ACSTA_WeakenGravityBox::HandleSaturationSetting(float InGravityCoef)
 {
     UE_LOG(LogCS, Log, TEXT("[NetMode : %d] HandleSaturationSetting, %f"), GetWorld()->GetNetMode(), GravityCoef);
     UMaterialInstanceDynamic* DynMaterial = Cast<UMaterialInstanceDynamic>(StaticMeshComp->GetMaterial(0));
@@ -113,7 +116,7 @@ void ACSTA_WeakenGravityBox::HandleSaturationSetting()
 
     // r:h g:s b:v a:a
     FLinearColor HSVColor = OrgColor.LinearRGBToHSV();
-    HSVColor.G *= GravityCoef;
+    HSVColor.G *= InGravityCoef;
 
     DynMaterial->SetVectorParameterValue(FName(TEXT("Color")), HSVColor.HSVToLinearRGB());
 }
