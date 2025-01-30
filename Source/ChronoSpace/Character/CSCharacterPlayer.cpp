@@ -21,7 +21,7 @@
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
-	//bReplicates = true;
+	bReplicates = true;
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -142,7 +142,7 @@ void ACSCharacterPlayer::PossessedBy(AController* NewController)
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetupPlayerInputComponent"), GetWorld()->GetNetMode());
+	//UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetupPlayerInputComponent"), GetWorld()->GetNetMode());
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
@@ -166,7 +166,7 @@ void ACSCharacterPlayer::OnRep_PlayerState()
 void ACSCharacterPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
+	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
 
 	if ( HasAuthority() )
 	{
@@ -232,7 +232,7 @@ void ACSCharacterPlayer::SetASC()
 	{
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
-		UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
+		//UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 	}
 	else
 	{
@@ -361,7 +361,7 @@ void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
 	if (Spec)
 	{
 		if (Spec->InputPressed) return;
-		UE_LOG(LogCS, Log, TEXT("[NetMode : %d], HandleGASInputPressed"), GetWorld()->GetNetMode());
+		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], HandleGASInputPressed"), GetWorld()->GetNetMode());
 		Spec->InputPressed = true;
 		if (Spec->IsActive())
 		{

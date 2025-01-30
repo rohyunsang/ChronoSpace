@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UI/CSGASEnergyBarUserWidget.h"
+#include "ActorComponent/CSCustomGravityDirComponent.h"
 #include "Physics/CSCollision.h"
 
 // Sets default values
@@ -24,7 +25,7 @@ ACSCharacterBase::ACSCharacterBase()
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(45.0f, 500.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -47,6 +48,9 @@ ACSCharacterBase::ACSCharacterBase()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
 	}
+
+	// Gravity Core
+	CustomGravityDirComponent = CreateDefaultSubobject<UCSCustomGravityDirComponent>(TEXT("CustomGravityDirComponent"));
 }
 
 void ACSCharacterBase::SetDead()

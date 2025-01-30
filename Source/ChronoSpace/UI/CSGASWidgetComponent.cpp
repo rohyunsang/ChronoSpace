@@ -8,7 +8,7 @@
 void UCSGASWidgetComponent::InitWidget()
 {
 	Super::InitWidget();
-	UE_LOG(LogCS, Log, TEXT("InitWidget IS Called"));
+	//UE_LOG(LogCS, Log, TEXT("InitWidget IS Called"));
 	UCSGASUserWidget* GASUserWidget = Cast<UCSGASUserWidget>(GetWidget());
 	if (GASUserWidget)
 	{

@@ -137,10 +137,8 @@ public:
 	void SetWhiteHall(class ACSWhiteHall* InWhiteHall) { WhiteHall = InWhiteHall; }
 	void ClearWhiteHall();
 
+// Misc
 protected:
 	UPROPERTY()
 	TObjectPtr<class ACSWhiteHall> WhiteHall;
-
-	UPROPERTY()
-	TObjectPtr<class ACSGravityCore> CurrentGravityCore;
 };

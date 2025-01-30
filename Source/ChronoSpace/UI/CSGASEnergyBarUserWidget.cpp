@@ -62,10 +62,10 @@ void UCSGASEnergyBarUserWidget::OnMaxEnergyChanged(const FOnAttributeChangeData&
 
 void UCSGASEnergyBarUserWidget::UpdateEnergyBar()
 {
-	UE_LOG(LogCS, Log, TEXT("UpdateEnergyBar Is Called"));
+	//UE_LOG(LogCS, Log, TEXT("UpdateEnergyBar Is Called"));
 	if (PbEnergyBar)
 	{
-		UE_LOG(LogCS, Log, TEXT("UpdateEnergyBar : %f / %f"), CurrentEnergy, CurrentMaxEnergy);
+		//UE_LOG(LogCS, Log, TEXT("UpdateEnergyBar : %f / %f"), CurrentEnergy, CurrentMaxEnergy); 
 		PbEnergyBar->SetPercent(CurrentEnergy / CurrentMaxEnergy);
 	}
 

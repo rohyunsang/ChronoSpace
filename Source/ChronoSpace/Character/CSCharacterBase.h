@@ -17,4 +17,7 @@ public:
 
 protected:
 	virtual void SetDead();
+
+	UPROPERTY()
+	TObjectPtr<class UCSCustomGravityDirComponent> CustomGravityDirComponent;
 };
