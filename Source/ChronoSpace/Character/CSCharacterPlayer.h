@@ -6,6 +6,7 @@
 #include "Character/CSCharacterBase.h"
 #include "AbilitySystemInterface.h"
 #include "InputActionValue.h"
+#include "CSF_CharacterFrameData.h"
 #include "CSCharacterPlayer.generated.h"
 
 UENUM()
@@ -15,6 +16,8 @@ enum class EAbilityIndex : uint8
 	BlackHole = 1,
 
 	ChronoControl = 100,
+	TimeRewind = 101,
+
 	AbilityPreviewBox = 200 
 };
 
@@ -32,6 +35,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaTime) override; 
 
 protected:
 	virtual void BeginPlay() override;
@@ -69,6 +73,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AbilityPreviewAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> TimeRewindAction;
+
 // ASC Section
 protected:
 	void SetupGASInputComponent();
@@ -86,4 +93,24 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UCSGASWidgetComponent> EnergyBar;
+
+
+// Character Frame Datas
+	// 3초간 Transform 저장
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Transform History")
+	TArray<FCSF_CharacterFrameData> TransformHistory;
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
+	float RecordInterval = 0.01f; // Transform 기록 주기 (0.01초)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
+	int32 MaxHistorySize = 300; // 3초 동안의 Transform 기록 (0.01초 간격)
+
+	// 현재 Transform을 기록
+	void RecordTransform();
+
+	float TimeSinceLastRecord = 0.0f; // 마지막 기록 이후 경과 시간
+
 };

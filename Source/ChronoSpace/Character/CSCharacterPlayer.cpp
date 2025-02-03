@@ -11,10 +11,13 @@
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/CSGASWidgetComponent.h"
+#include "Character/CSF_CharacterFrameData.h"
 #include "UI/CSGASUserWidget.h"
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
+	PrimaryActorTick.bCanEverTick = true; // Tick 활성화 
+
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -55,10 +58,17 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	{
 		ChronoControlAction = InputActionChronoControlRef.Object;
 	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAbilityPreviewRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_AbilityPreview.IA_AbilityPreview'"));
 	if (nullptr != InputActionAbilityPreviewRef.Object)
 	{
 		AbilityPreviewAction = InputActionAbilityPreviewRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTimeRewindRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_TimeRewind.IA_TimeRewind'"));
+	if (nullptr != InputActionTimeRewindRef.Object)
+	{
+		TimeRewindAction = InputActionTimeRewindRef.Object;
 	}
 
 	// UI 
@@ -87,6 +97,30 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	ASC = nullptr;
 
 }
+
+void ACSCharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	TimeSinceLastRecord += DeltaTime;
+	if (TimeSinceLastRecord >= RecordInterval)
+	{
+		RecordTransform();
+		TimeSinceLastRecord = 0.0f;
+	}
+}
+
+void ACSCharacterPlayer::RecordTransform()
+{
+	FCSF_CharacterFrameData FrameData(GetActorLocation(), GetActorRotation(), GetWorld()->GetTimeSeconds());
+
+	if (TransformHistory.Num() >= MaxHistorySize + 1) // 1 is offset
+	{
+		TransformHistory.RemoveAt(0); // 오래된 데이터 제거
+	}
+	TransformHistory.Add(FrameData);
+}
+
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 {
@@ -194,6 +228,8 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::AbilityPreviewBox);
 		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::AbilityPreviewBox);
 
+		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimeRewind);
+		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimeRewind);
 
 
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
