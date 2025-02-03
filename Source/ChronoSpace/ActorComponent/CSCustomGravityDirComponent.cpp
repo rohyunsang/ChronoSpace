@@ -40,7 +40,8 @@ void UCSCustomGravityDirComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UCSCustomGravityDirComponent, CurrentGravityDirection);
+	//DOREPLIFETIME(UCSCustomGravityDirComponent, CurrentGravityDirection);
+	DOREPLIFETIME(UCSCustomGravityDirComponent, Pitch);
 }
 
 FVector UCSCustomGravityDirComponent::GetDirection()
@@ -56,17 +57,6 @@ FVector UCSCustomGravityDirComponent::GetDirection()
 	return FVector();
 } 
 
-void UCSCustomGravityDirComponent::OnRep_CurrentGravityDirection()
-{
-	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] OnRep_CurrentGravityDirection, (%f, %f, %f)"), GetNetMode(), CurrentGravityDirection.X, CurrentGravityDirection.Y, CurrentGravityDirection.Z);
-
-	if ( OwnerCharacter )
-	{
-		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
-	}
-}
-
-
 // Called every frame
 void UCSCustomGravityDirComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -74,14 +64,24 @@ void UCSCustomGravityDirComponent::TickComponent(float DeltaTime, ELevelTick Tic
 
 	if (OwnerCharacter == nullptr) return;
 
-	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent, (%f, %f, %f)"), GetNetMode(), OwnerCharacter->GetGravityDirection().X, OwnerCharacter->GetGravityDirection().Y, OwnerCharacter->GetGravityDirection().Z);
+	UE_LOG(LogCS, Log, TEXT("########################################################"));
+	UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent, (%f, %f, %f)"), GetNetMode(), OwnerCharacter->GetGravityDirection().X, OwnerCharacter->GetGravityDirection().Y, OwnerCharacter->GetGravityDirection().Z);
 	UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent, (%f, %f)"), GetNetMode(), OwnerCharacter->GetActorRotation().Yaw, OwnerCharacter->GetActorRotation().Pitch);
+	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent Pitch, (%f)"), GetNetMode(), Pitch);
+	UE_LOG(LogCS, Log, TEXT("########################################################"));
 
-	if ( OwnerCharacter->HasAuthority() && CurrentGravityCore )
+	if ( /*OwnerCharacter->HasAuthority() &&*/ CurrentGravityCore )
 	{
 		CurrentGravityDirection = GetDirection();
 		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
+		Pitch = OwnerCharacter->GetActorRotation().Pitch;
 	}
+	
+
+	/*if ( !OwnerCharacter->HasAuthority() )
+	{
+		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
+	}*/
 }
 
 void UCSCustomGravityDirComponent::OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)

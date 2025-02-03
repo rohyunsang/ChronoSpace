@@ -24,11 +24,11 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class ACSGravityCore> CurrentGravityCore;
 
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentGravityDirection)
+	//UPROPERTY(Replicated )
 	FVector CurrentGravityDirection;
 	
-	UFUNCTION()
-	void OnRep_CurrentGravityDirection();
+	UPROPERTY(Replicated )
+	float Pitch;
 
 	UPROPERTY()
 	TObjectPtr<class ACharacter> OwnerCharacter;
