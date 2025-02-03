@@ -219,6 +219,7 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 	if (IsValid(ASC) && IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
 
@@ -231,6 +232,10 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimeRewind);
 		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimeRewind);
 
+		if (ASC)
+		{
+			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Ability.Movement")));
+		}
 
 		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
 	}
