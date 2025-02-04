@@ -103,10 +103,10 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	float RecordInterval = 0.01f; // Transform 기록 주기 (0.01초)
+	float RecordInterval = 0.03f; // Transform 기록 주기 (0.03초)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	int32 MaxHistorySize = 300; // 3초 동안의 Transform 기록 (0.01초 간격)
+	int32 MaxHistorySize = 99; // 3초 동안의 Transform 기록 (0.03초 간격)
 
 	// 현재 Transform을 기록
 	void RecordTransform();

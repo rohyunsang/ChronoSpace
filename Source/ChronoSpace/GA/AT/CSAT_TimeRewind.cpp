@@ -56,11 +56,11 @@ void UCSAT_TimeRewind::MoveToNextFrame()
     TargetActor->SetActorLocationAndRotation(NewLocation, NewRotation);
 
     // 다음 프레임으로 진행
-    CurrentFrameIndex -= 3;
+    CurrentFrameIndex--;
     if (CurrentFrameIndex < 0) CurrentFrameIndex = 0; // 음수 방지
 
 
-    // 일정 시간 후 다시 실행 (300 프레임을 1초 동안 이동해야 하므로, 0.0033초마다 실행)
+    // 일정 시간 후 다시 실행 
     GetWorld()->GetTimerManager().SetTimer(
         RewindTimerHandle,
         this,

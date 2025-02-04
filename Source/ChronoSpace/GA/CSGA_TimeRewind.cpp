@@ -45,7 +45,7 @@ void UCSGA_TimeRewind::ActivateAbility(
     }
 
     ACSCharacterPlayer* PlayerCharacter = Cast<ACSCharacterPlayer>(AvatarActor);
-    if (!PlayerCharacter || PlayerCharacter->TransformHistory.Num() < 300)
+    if (!PlayerCharacter || PlayerCharacter->TransformHistory.Num() < 99)
     {
         UE_LOG(LogTemp, Warning, TEXT("Not enough Transform History Available"));
         EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
@@ -74,7 +74,7 @@ void UCSGA_TimeRewind::ActivateAbility(
 
     // Ability Task 생성 (0.5초 동안 되감기)
     TArray<FCSF_CharacterFrameData> RewindFrames;
-    for (int32 i = PlayerCharacter->TransformHistory.Num() - 300; i < PlayerCharacter->TransformHistory.Num(); i++)
+    for (int32 i = PlayerCharacter->TransformHistory.Num() - 99; i < PlayerCharacter->TransformHistory.Num(); i++)
     {
         RewindFrames.Add(PlayerCharacter->TransformHistory[i]);
     }
