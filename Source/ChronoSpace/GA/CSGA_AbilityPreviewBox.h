@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Character/CSCharacterPlayer.h"
 #include "CSGA_AbilityPreviewBox.generated.h"
 
 /**
@@ -19,6 +20,16 @@ public:
 
 	FORCEINLINE const float GetDurationTime() const { return DurationTime; }
 	FORCEINLINE void SetDurationTime(float InDuarionTime) { DurationTime = InDuarionTime; }
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+	EAbilityIndex Ability;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	TSubclassOf<class UCSGA_WeakenGravity> WeakenGravity10P;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ability")
+	TSubclassOf<class UCSGA_WeakenGravity> WeakenGravity50P;
+
 private:
 	void ActivateTask();
 

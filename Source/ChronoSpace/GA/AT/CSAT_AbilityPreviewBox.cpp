@@ -98,13 +98,48 @@ void UCSAT_AbilityPreviewBox::CreateStaticMesh()
         StaticMeshComp->SetRelativeScale3D(MeshScale);
 
         // 런타임에서 메테리얼 로드
-        UMaterial* MaterialRef = Cast<UMaterial>(
-            StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_ChronoControlPreview.MAT_ChronoControlPreview"))
-        );
-        if (MaterialRef)
+        if ( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::ChronoControl )
         {
-            SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_ChronoControlPreview.MAT_ChronoControlPreview"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
         }
+        else if( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::ReverseGravity )
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_AntyGravityPreview.MAT_AntyGravityPreview"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+        else if ( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::WeakenGravity50P )
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_WeakenGravityPreview50P.MAT_WeakenGravityPreview50P"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+        else
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_WeakenGravityPreview10P.MAT_WeakenGravityPreview10P"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+
+        
     }
 }
 void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
