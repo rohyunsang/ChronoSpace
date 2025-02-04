@@ -10,7 +10,6 @@
 
 UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
 	OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 }
@@ -27,21 +26,23 @@ void UCSCustomGravityDirComponent::BeginPlay()
 
 		if ( OwnerCharacter && OwnerCharacter->HasAuthority() )
 		{
-			UE_LOG(LogCS, Log, TEXT("[NetMode : %d] BeginPlay"), GetNetMode());
+			//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] BeginPlay"), GetNetMode());
 			OwnerCharacter->OnActorBeginOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorBeginOverlapCallback);
 			OwnerCharacter->OnActorEndOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorEndOverlapCallback);
 		}
-	}
 
-	
+		if ( OwnerCharacter->HasAuthority() )
+		{
+			GetWorld()->GetTimerManager().SetTimer(GravityCheckTimerHandle, this, &UCSCustomGravityDirComponent::CheckGravity, 0.3f, true);
+		}
+	}
 }
 
 void UCSCustomGravityDirComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(UCSCustomGravityDirComponent, CurrentGravityDirection);
-	DOREPLIFETIME(UCSCustomGravityDirComponent, Pitch);
+	DOREPLIFETIME(UCSCustomGravityDirComponent, CurrentGravityDirection);
 }
 
 FVector UCSCustomGravityDirComponent::GetDirection()
@@ -57,31 +58,18 @@ FVector UCSCustomGravityDirComponent::GetDirection()
 	return FVector();
 } 
 
-// Called every frame
-void UCSCustomGravityDirComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UCSCustomGravityDirComponent::OnRep_CurrentGravityDirection()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (OwnerCharacter == nullptr) return;
-
-	UE_LOG(LogCS, Log, TEXT("########################################################"));
-	UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent, (%f, %f, %f)"), GetNetMode(), OwnerCharacter->GetGravityDirection().X, OwnerCharacter->GetGravityDirection().Y, OwnerCharacter->GetGravityDirection().Z);
-	UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent, (%f, %f)"), GetNetMode(), OwnerCharacter->GetActorRotation().Yaw, OwnerCharacter->GetActorRotation().Pitch);
-	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] TickComponent Pitch, (%f)"), GetNetMode(), Pitch);
-	UE_LOG(LogCS, Log, TEXT("########################################################"));
-
-	if ( /*OwnerCharacter->HasAuthority() &&*/ CurrentGravityCore )
+	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] OnRep_CurrentGravityDirection, (%f, %f, %f)"), GetNetMode(), CurrentGravityDirection.X, CurrentGravityDirection.Y, CurrentGravityDirection.Z);
+	if (OwnerCharacter)
 	{
-		CurrentGravityDirection = GetDirection();
-		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
-		Pitch = OwnerCharacter->GetActorRotation().Pitch;
+		FVector CurrentDirection = OwnerCharacter->GetCharacterMovement()->GetGravityDirection();
+		if ( !( (CurrentDirection - CurrentGravityDirection) / 1000.0f ).IsNearlyZero() )
+		{
+			OwnerCharacter->GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
+			OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
+		}
 	}
-	
-
-	/*if ( !OwnerCharacter->HasAuthority() )
-	{
-		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
-	}*/
 }
 
 void UCSCustomGravityDirComponent::OnActorBeginOverlapCallback(AActor* OverlappedActor, AActor* OtherActor)
@@ -104,6 +92,17 @@ void UCSCustomGravityDirComponent::OnActorEndOverlapCallback(AActor* OverlappedA
 		CurrentGravityDirection = OrgGravityDirection;
 		Character->GetCharacterMovement()->SetGravityDirection(OrgGravityDirection);
 		CurrentGravityCore = nullptr;
+	}
+}
+
+void UCSCustomGravityDirComponent::CheckGravity()
+{
+	if (OwnerCharacter == nullptr) return;
+
+	if (OwnerCharacter->HasAuthority() && CurrentGravityCore)
+	{
+		CurrentGravityDirection = GetDirection();
+		OwnerCharacter->GetCharacterMovement()->SetGravityDirection(CurrentGravityDirection);
 	}
 }
 

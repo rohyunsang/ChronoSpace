@@ -24,19 +24,16 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class ACSGravityCore> CurrentGravityCore;
 
-	//UPROPERTY(Replicated )
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentGravityDirection)
 	FVector CurrentGravityDirection;
-	
-	UPROPERTY(Replicated )
-	float Pitch;
+
+	UFUNCTION()
+	void OnRep_CurrentGravityDirection();
 
 	UPROPERTY()
 	TObjectPtr<class ACharacter> OwnerCharacter;
 
 	FVector OrgGravityDirection;
-
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
 	UFUNCTION()
@@ -44,5 +41,9 @@ protected:
 
 	UFUNCTION()
 	void OnActorEndOverlapCallback(AActor* OverlappedActor, AActor* OtherActor);
-		
+
+protected:
+	FTimerHandle GravityCheckTimerHandle;
+	
+	void CheckGravity();
 };
