@@ -6,16 +6,22 @@
 #include "Character/CSCharacterBase.h"
 #include "AbilitySystemInterface.h"
 #include "InputActionValue.h"
+#include "CSF_CharacterFrameData.h"
 #include "CSCharacterPlayer.generated.h"
 
 UENUM()
 enum class EAbilityIndex : uint8
 {
+
 	ReverseGravity = 1,
 	BlackHole = 2,
 	WhiteHole = 3,
 	WeakenGravity10P = 4,
-	WeakenGravity50P = 5
+	WeakenGravity50P = 5,
+	ChronoControl = 100,
+	TimeRewind = 101,
+
+	AbilityPreviewBox = 200 
 };
 
 /**
@@ -32,6 +38,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Tick(float DeltaTime) override; 
 
 	virtual void OnRep_PlayerState() override;
 
@@ -75,6 +82,7 @@ protected:
 	TObjectPtr<class UInputAction> ReverseGravityAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+
 	TObjectPtr<class UInputAction> BlackHoleAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
@@ -85,6 +93,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> WeakenGravity50PAction;
+
+	TObjectPtr<class UInputAction> ChronoControlAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AbilityPreviewAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> TimeRewindAction;
 
 // ASC Section
 protected:
@@ -141,4 +157,24 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<class ACSWhiteHall> WhiteHall;
+
+
+// Character Frame Datas
+	// 3�ʰ� Transform ����
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Transform History")
+	TArray<FCSF_CharacterFrameData> TransformHistory;
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
+	float RecordInterval = 0.03f; // Transform ��� �ֱ� (0.03��)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
+	int32 MaxHistorySize = 99; // 3�� ������ Transform ��� (0.03�� ����)
+
+	// ���� Transform�� ���
+	void RecordTransform();
+
+	float TimeSinceLastRecord = 0.0f; // ������ ��� ���� ��� �ð�
+
 };

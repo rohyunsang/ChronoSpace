@@ -28,7 +28,7 @@ protected:
 	UFUNCTION()
 	void OnTargetActorReadyCallback();
 
-	// ¼­ºê Å¬·¡½º ±¸Çö ÇÊ¿ä -------------------------------
+	// ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ -------------------------------
 	virtual void SpawnAndInitializeTargetActor() {};
 	virtual void FinalizeTargetActor() {};
 	virtual void EndTargetActor() {};

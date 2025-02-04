@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/CSGASWidgetComponent.h"
+#include "Character/CSF_CharacterFrameData.h"
 #include "UI/CSGASUserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -24,6 +25,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	bReplicates = true;
 
 	PrimaryActorTick.bCanEverTick = true;
+
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -88,6 +90,23 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	if (nullptr != InputActionWhiteHoleRef.Object)
 	{
 		WeakenGravity50PAction = InputActionWeakenGravity50PActionRef.Object;
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChronoControlRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ChronoControl.IA_ChronoControl'"));
+	if (nullptr != InputActionChronoControlRef.Object)
+	{
+		ChronoControlAction = InputActionChronoControlRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAbilityPreviewRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_AbilityPreview.IA_AbilityPreview'"));
+	if (nullptr != InputActionAbilityPreviewRef.Object)
+	{
+		AbilityPreviewAction = InputActionAbilityPreviewRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTimeRewindRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_TimeRewind.IA_TimeRewind'"));
+	if (nullptr != InputActionTimeRewindRef.Object)
+	{
+		TimeRewindAction = InputActionTimeRewindRef.Object;
 	}
 
 	// UI 
@@ -124,7 +143,32 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
+
 }
+
+void ACSCharacterPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	TimeSinceLastRecord += DeltaTime;
+	if (TimeSinceLastRecord >= RecordInterval)
+	{
+		RecordTransform();
+		TimeSinceLastRecord = 0.0f;
+	}
+}
+
+void ACSCharacterPlayer::RecordTransform()
+{
+	FCSF_CharacterFrameData FrameData(GetActorLocation(), GetActorRotation(), GetWorld()->GetTimeSeconds());
+
+	if (TransformHistory.Num() >= MaxHistorySize + 1) // 1 is offset
+	{
+		TransformHistory.RemoveAt(0); 
+	}
+	TransformHistory.Add(FrameData);
+}
+
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 {
@@ -179,7 +223,7 @@ void ACSCharacterPlayer::BeginPlay()
 		return;
 	}
 
-	// ÀÌ ¹ØÀ¸·Ð ·ÎÄÃ ÄÁÆ®·Ñ·¯¸¸ ÁøÀÔ °¡´É
+	// ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½Ñ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) 
 	{
@@ -308,8 +352,10 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 	if (IsValid(InputComponent))
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
 		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
+
 		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::BlackHole);
 		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::BlackHole);
 		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WhiteHole);
@@ -319,6 +365,26 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity50P);
 		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity50P);
 		//UE_LOG(LogCS, Log, TEXT("SetupGASInputComponent Succeed"));
+
+		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ChronoControl);
+		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ChronoControl);
+
+		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::AbilityPreviewBox);
+		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::AbilityPreviewBox);
+
+		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimeRewind);
+		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimeRewind);
+
+		if (ASC)
+		{
+			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Ability.Movement")));
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
+	}
+	else if (!IsValid(ASC))
+	{
+		UE_LOG(LogTemp, Log, TEXT("Invalid ASC"));
 	}
 	else
 	{

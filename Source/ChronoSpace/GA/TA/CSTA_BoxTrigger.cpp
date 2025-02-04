@@ -5,11 +5,29 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Physics/CSCollision.h"
+#include "DataAsset/CSDA_BoxProperties.h"
 #include "ChronoSpace.h"
 
 ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 {
     bReplicates = true;
+
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    const FString AssetPath = TEXT("/Game/DataAssets/CSDA_BoxProperties.CSDA_BoxProperties");
+    UCSDA_BoxProperties* BoxPropertiesAsset = Cast<UCSDA_BoxProperties>(StaticLoadObject(UCSDA_BoxProperties::StaticClass(), nullptr, *AssetPath));
+    
+    BoxExtentSize = 200.0f; // default value
+
+    if (BoxPropertiesAsset)
+    {
+        BoxExtentSize = BoxPropertiesAsset->BoxSize; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½ BoxSize ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        UE_LOG(LogTemp, Log, TEXT("BoxExtentSize loaded from DataAsset: %f"), BoxExtentSize);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load CSDA_BoxProperties at path: %s"), *AssetPath);
+    }
+
 
 	// Trigger
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxTrigger"));
@@ -19,7 +37,7 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 	BoxTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
     BoxTrigger->SetIsReplicated(true);
 
-	// ¿À¹ö·¦ ÀÌº¥Æ® ¼­ºê Å¬·¡½º¿¡¼­ Ãß°¡ ÇÊ¿ä
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ ï¿½Ê¿ï¿½
 	//BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
 	//BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
 
@@ -36,14 +54,14 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
     }
 
     FVector BoxExtent = FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize);
-    float HalfSizeOfSide = 50.0f; // SM_Cube ±âº» »çÀÌÁî°¡ 100x100x100 -> ¹Ý°æ(Extent) ±âÁØ 50
+    float HalfSizeOfSide = 50.0f; // SM_Cube ï¿½âº» ï¿½ï¿½ï¿½ï¿½ï¿½î°¡ 100x100x100 -> ï¿½Ý°ï¿½(Extent) ï¿½ï¿½ï¿½ï¿½ 50
     FVector LocationOffset = FVector(-HalfSizeOfSide, -HalfSizeOfSide, -HalfSizeOfSide);
     MeshScale = BoxExtent / HalfSizeOfSide;
 
     StaticMeshComp->SetRelativeLocation(LocationOffset * MeshScale);
     StaticMeshComp->SetRelativeScale3D(MeshScale);
 
-    // ¼­ºê Å¬·¡½º¿¡¼­ SetSteticMeshMaterial È£ÃâÇØ¼­ ¸ÅÅ×¸®¾ó ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ SetSteticMeshMaterial È£ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     // SetSteticMeshMaterial(~, MeshScale.X)
 }
 
@@ -56,7 +74,7 @@ void ACSTA_BoxTrigger::BeginPlay()
     if (BoxTrigger)
     {
         FVector BoxLocation = BoxTrigger->GetComponentLocation();
-        FVector BoxExtent = BoxTrigger->GetScaledBoxExtent(); // ½ºÄÉÀÏÀÌ Àû¿ëµÈ ¹Ú½º Å©±â
+        FVector BoxExtent = BoxTrigger->GetScaledBoxExtent(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ Å©ï¿½ï¿½
         FQuat   BoxRotation = BoxTrigger->GetComponentRotation().Quaternion();
 
         DrawDebugBox(
@@ -65,10 +83,10 @@ void ACSTA_BoxTrigger::BeginPlay()
             BoxExtent,
             BoxRotation,
             FColor::Green,
-            false,  // Áö¼Ó Ç¥½Ã
+            false,  // ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
             1,
-            0,     // µð¹ö±× ¼± ¿ì¼±¼øÀ§
-            2.0f   // ¼± µÎ²²
+            0,     // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ì¼±ï¿½ï¿½ï¿½ï¿½
+            2.0f   // ï¿½ï¿½ ï¿½Î²ï¿½
         );
     }
 }
