@@ -38,13 +38,13 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void Tick(float DeltaTime) override; 
+	
 
 	virtual void OnRep_PlayerState() override;
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 	virtual void SetDead() override;
 
 	UFUNCTION()

@@ -90,6 +90,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	if (nullptr != InputActionWhiteHoleRef.Object)
 	{
 		WeakenGravity50PAction = InputActionWeakenGravity50PActionRef.Object;
+	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChronoControlRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ChronoControl.IA_ChronoControl'"));
 	if (nullptr != InputActionChronoControlRef.Object)
@@ -146,17 +147,6 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 
 }
 
-void ACSCharacterPlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	TimeSinceLastRecord += DeltaTime;
-	if (TimeSinceLastRecord >= RecordInterval)
-	{
-		RecordTransform();
-		TimeSinceLastRecord = 0.0f;
-	}
-}
 
 void ACSCharacterPlayer::RecordTransform()
 {
@@ -237,6 +227,13 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	TimeSinceLastRecord += DeltaSeconds;
+	if (TimeSinceLastRecord >= RecordInterval)
+	{
+		RecordTransform();
+		TimeSinceLastRecord = 0.0f;
+	}
+
 	if ( GetCharacterMovement()->Velocity.IsNearlyZero() )
 	{
 		return;
@@ -251,10 +248,10 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 	{
 		if ( IsValid(Char.Value()) )
 		{
-			Char.Value()->GetCharacterMovement()->AddImpulse(Power);
+			Char.Value()->GetCharacterMovement()->AddImpulse(Power); 
 		}
-	}
-}
+	} 
+} 
 
 void ACSCharacterPlayer::SetDead()
 {

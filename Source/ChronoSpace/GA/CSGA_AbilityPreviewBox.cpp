@@ -62,12 +62,14 @@ void UCSGA_AbilityPreviewBox::RunAbility(float BoxSize)
 	if (CurrentActorInfo->AbilitySystemComponent.IsValid())
 	{
 		UAbilitySystemComponent* ASC = CurrentActorInfo->AbilitySystemComponent.Get();
+		
 		FGameplayAbilitySpec* NewAbilitySpec = ASC->FindAbilitySpecFromClass(UCSGA_ChronoControl::StaticClass());
 		if (NewAbilitySpec)
 		{
 			ASC->TryActivateAbility(NewAbilitySpec->Handle); // 새로운 어빌리티 실행
 		}
 	}
+	
 
 	StopActivateTask(); // 부모 어빌리티 종료 처리
 }
