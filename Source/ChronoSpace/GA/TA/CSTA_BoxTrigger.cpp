@@ -20,11 +20,11 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
     if (BoxPropertiesAsset)
     {
         BoxExtentSize = BoxPropertiesAsset->BoxSize;
-        UE_LOG(LogTemp, Log, TEXT("BoxExtentSize loaded from DataAsset: %f"), BoxExtentSize);
+        UE_LOG(LogCS, Log, TEXT("BoxExtentSize loaded from DataAsset: %f"), BoxExtentSize);
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to load CSDA_BoxProperties at path: %s"), *AssetPath);
+        UE_LOG(LogCS, Error, TEXT("Failed to load CSDA_BoxProperties at path: %s"), *AssetPath);
     }
 
 
@@ -32,7 +32,7 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 	BoxTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxTrigger"));
 	RootComponent = BoxTrigger;
 	BoxTrigger->SetBoxExtent(FVector(BoxExtentSize, BoxExtentSize, BoxExtentSize));
-	BoxTrigger->SetRelativeLocation(FVector(350.0f, 0.0f, 100.0f));
+	BoxTrigger->SetRelativeLocation(FVector(350.0f, 0.0f, 100.0f + (BoxExtentSize - 200.0f)));
 	BoxTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
     BoxTrigger->SetIsReplicated(true);
 
@@ -66,6 +66,8 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 void ACSTA_BoxTrigger::BeginPlay()
 {
 	Super::BeginPlay();
+    
+    UE_LOG(LogCS, Log, TEXT("BoxTrigger, %f, %f, %f"), BoxTrigger->GetComponentLocation().X, BoxTrigger->GetComponentLocation().Y, BoxTrigger->GetComponentLocation().Z);
 
 	if (!bShowDebug) return;
 

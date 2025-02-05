@@ -182,10 +182,9 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
 
     // ForwardVector와 RightVector를 기반으로 PlayerOffset 계산
     FVector ForwardOffset = ForwardVector * 350.0f; // 플레이어 앞 방향으로 350 단위
-    FVector RightOffset = RightVector * YOffset;   // 오른쪽 방향으로 YOffset 만큼 이동
-    FVector UpOffset(0.0f, 0.0f, 100.0f);          // 위쪽으로 100 단위
+    FVector UpOffset(0.0f, 0.0f, 100.0f + (CurrentSize - 200.0f));          // 위쪽으로 100 단위
 
-    FVector NewLocation = ActorLocation + ForwardOffset + RightOffset + UpOffset;
+    FVector NewLocation = ActorLocation + ForwardOffset /*+ RightOffset*/ + UpOffset;
 
     // 박스 위치 업데이트
     PreviewBox->SetWorldLocation(NewLocation);
@@ -251,8 +250,11 @@ void UCSAT_AbilityPreviewBox::AdjustPreviewBoxScale(bool bIncrease)
     PreviewBox->SetBoxExtent(NewExtent);
 
     // Static Mesh 크기도 변경
-    FVector MeshScale = NewExtent / 50.0f; // 기본 박스 크기를 기준으로 스케일 계산
+    float HalfSizeOfSide = 50.0f;
+    FVector MeshScale = NewExtent / HalfSizeOfSide; // 기본 박스 크기를 기준으로 스케일 계산
     StaticMeshComp->SetRelativeScale3D(MeshScale);
+    FVector LocationOffset = FVector(-HalfSizeOfSide, -HalfSizeOfSide, -HalfSizeOfSide);
+    StaticMeshComp->SetRelativeLocation(LocationOffset * MeshScale);
 
     UE_LOG(LogTemp, Log, TEXT("PreviewBox Scale Adjusted: Current Size: %.2f, New Size: %.2f"), CurrentSize, NewSize);
     UE_LOG(LogTemp, Log, TEXT("PreviewBox Adjusted Extent: X=%.2f, Y=%.2f, Z=%.2f"), NewExtent.X, NewExtent.Y, NewExtent.Z);
