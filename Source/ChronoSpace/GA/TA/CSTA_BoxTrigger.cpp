@@ -12,7 +12,6 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 {
     bReplicates = true;
 
-    // ������ ���� ���
     const FString AssetPath = TEXT("/Game/DataAssets/CSDA_BoxProperties.CSDA_BoxProperties");
     UCSDA_BoxProperties* BoxPropertiesAsset = Cast<UCSDA_BoxProperties>(StaticLoadObject(UCSDA_BoxProperties::StaticClass(), nullptr, *AssetPath));
     
@@ -20,7 +19,7 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 
     if (BoxPropertiesAsset)
     {
-        BoxExtentSize = BoxPropertiesAsset->BoxSize; // ������ ���¿��� BoxSize ��������
+        BoxExtentSize = BoxPropertiesAsset->BoxSize;
         UE_LOG(LogTemp, Log, TEXT("BoxExtentSize loaded from DataAsset: %f"), BoxExtentSize);
     }
     else
@@ -37,7 +36,6 @@ ACSTA_BoxTrigger::ACSTA_BoxTrigger()
 	BoxTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
     BoxTrigger->SetIsReplicated(true);
 
-	// ������ �̺�Ʈ ���� Ŭ�������� �߰� �ʿ�
 	//BoxTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerBeginOverlap);
 	//BoxTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSTA_ReverseGravityBox::OnTriggerEndOverlap);
 

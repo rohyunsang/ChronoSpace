@@ -77,6 +77,7 @@ void UCSAT_AbilityPreviewBox::CreateStaticMesh()
     StaticMeshComp = NewObject<UStaticMeshComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
     if (StaticMeshComp)
     {
+        StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         StaticMeshComp->RegisterComponent();
         StaticMeshComp->AttachToComponent(PreviewBox, FAttachmentTransformRules::KeepRelativeTransform);
 
