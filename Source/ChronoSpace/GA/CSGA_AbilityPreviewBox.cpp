@@ -14,6 +14,7 @@
 
 UCSGA_AbilityPreviewBox::UCSGA_AbilityPreviewBox()
 {
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalOnly;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	Ability = EAbilityIndex::ChronoControl;
 }
