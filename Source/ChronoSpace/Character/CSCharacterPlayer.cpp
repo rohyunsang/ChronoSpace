@@ -18,7 +18,11 @@
 #include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
 #include "Actor/CSGravityCore.h"
+#include "GameFramework/Character.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "ChronoSpace.h"
+
+
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
@@ -125,7 +129,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		EnergyBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		if (EnergyBar)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("EnergyBar is valid and configured."));
+			UE_LOG(LogTemp, Log, TEXT("EnergyBar is valid and configured."));
 		}
 		else
 		{
@@ -213,14 +217,14 @@ void ACSCharacterPlayer::BeginPlay()
 		return;
 	}
 
-	// �� ������ ���� ��Ʈ�ѷ��� ���� ����
 	APlayerController* PlayerController = CastChecked<APlayerController>(GetController()); 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer())) 
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))			
 	{
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
 
-	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] BeginPlay"), GetWorld()->GetNetMode());
+
+	AttachWindUpKeyToSocket();
 }
 
 void ACSCharacterPlayer::Tick(float DeltaSeconds)
@@ -480,6 +484,5 @@ void ACSCharacterPlayer::ClearWhiteHall()
 	}
 	WhiteHall = nullptr;
 }
-
 
 

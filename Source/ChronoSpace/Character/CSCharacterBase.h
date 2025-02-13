@@ -20,4 +20,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class UCSCustomGravityDirComponent> CustomGravityDirComponent;
+
+
+	// Wind Up Key
+protected:
+	void AttachWindUpKeyToSocket();
 };

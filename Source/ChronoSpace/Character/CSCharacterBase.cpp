@@ -37,12 +37,12 @@ ACSCharacterBase::ACSCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'"));
 	if (CharacterMeshRef.Object)
 	{
 		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
 	}
-
+	// /Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
 	if (AnimInstanceClassRef.Class)
 	{
@@ -59,3 +59,41 @@ void ACSCharacterBase::SetDead()
 	SetActorEnableCollision(false);
 }
 
+
+void ACSCharacterBase::AttachWindUpKeyToSocket()
+{
+	// 1. 블루프린트 클래스 로드
+	const FString WindUpKeyBPPath = TEXT("/Game/Blueprint/Character/WindUpKey.WindUpKey_C");
+	UClass* WindUpKeyBPClass = Cast<UClass>(StaticLoadObject(UClass::StaticClass(), nullptr, *WindUpKeyBPPath));
+
+	if (!WindUpKeyBPClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Blueprint class not found! Check the path."));
+		return;
+	}
+
+	// 2. 블루프린트 액터 생성
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* WindUpKeyActor = GetWorld()->SpawnActor<AActor>(WindUpKeyBPClass, SpawnParams);
+	if (!WindUpKeyActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn WindUpKey BP Actor."));
+		return;
+	}
+
+	// 3. 크기 조정 (스폰된 블루프린트의 루트 컴포넌트에 적용)
+	FVector DesiredScale(0.3f, 0.3f, 0.3f);
+	WindUpKeyActor->SetActorScale3D(DesiredScale);
+
+	// 4. 소켓 위치 가져오기
+	FName SocketName = TEXT("pelvisSocket");
+	FTransform SocketTransform = GetMesh()->GetSocketTransform(SocketName, RTS_World);
+
+	// 5. 소켓에 블루프린트 액터 부착
+	WindUpKeyActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+
+	UE_LOG(LogTemp, Log, TEXT("Blueprint Actor attached to socket: %s"), *SocketName.ToString());
+}
