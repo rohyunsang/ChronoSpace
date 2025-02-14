@@ -14,6 +14,9 @@ class CHRONOSPACE_API ACSLabyrinthKey : public AActor
 public:	
 	ACSLabyrinthKey();
 
+	UPROPERTY(ReplicatedUsing = OnRep_bIsActive)
+	bool bIsActive;
+
 	UFUNCTION()
 	void OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
 
@@ -22,6 +25,8 @@ public:
 
 	UFUNCTION()
 	void Interact();
+
+	void SetActive(bool bActive);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Trigger", Meta = (AllowPrivateAccess = "true"))
@@ -32,6 +37,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UWidgetComponent> InteractionPromptComponent;
+
+	UFUNCTION()
+	void OnRep_bIsActive();
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	float TriggerRange = 100.0f;
 };

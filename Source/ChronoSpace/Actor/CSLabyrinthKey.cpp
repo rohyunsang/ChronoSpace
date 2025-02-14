@@ -9,6 +9,7 @@
 #include "Subsystem/CSLabyrinthKeyWorldSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "ChronoSpace.h"
 
 // Sets default values
@@ -31,7 +32,7 @@ ACSLabyrinthKey::ACSLabyrinthKey()
 	StaticMeshComp->SetCollisionProfileName(CPROFILE_CSCAPSULE);
 	StaticMeshComp->SetIsReplicated(true);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/BlockSphere.BlockSphere'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/MapClockworkLabyrinth/Key/SM_SM_LabyrinthKey.SM_SM_LabyrinthKey'"));
 	if (StaticMeshRef.Object)
 	{
 		StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
@@ -59,6 +60,8 @@ ACSLabyrinthKey::ACSLabyrinthKey()
 	}
 
 	InteractionPromptComponent->SetVisibility(false);
+
+	SetActive(false);
 }
 
 void ACSLabyrinthKey::OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -98,4 +101,28 @@ void ACSLabyrinthKey::Interact()
 	Destroy();
 }
 
+void ACSLabyrinthKey::OnRep_bIsActive()
+{
+	if ( GetWorld() )
+	{
+		UE_LOG(LogCS, Log, TEXT("[NetMode : %d] OnRep_bIsActive, %d"), GetWorld()->GetNetMode(), bIsActive);
+	}
+	
+	SetActorHiddenInGame(!bIsActive);
+	SetActorEnableCollision(bIsActive);
+	//SetActorTickEnabled(bIsActive);
+}
 
+void ACSLabyrinthKey::SetActive(bool bActive)
+{
+	if ( HasAuthority() )
+	{
+		bIsActive = bActive;
+		OnRep_bIsActive();
+	}
+}
+
+void ACSLabyrinthKey::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME(ACSLabyrinthKey, bIsActive);
+}

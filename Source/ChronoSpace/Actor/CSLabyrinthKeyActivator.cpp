@@ -10,7 +10,10 @@
 ACSLabyrinthKeyActivator::ACSLabyrinthKeyActivator()
 {
 	bReplicates = true;
-	MaxKeyCount = 3;
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	MaxKeyCount = 10;
 }
 
 // Called when the game starts or when spawned
@@ -23,14 +26,6 @@ void ACSLabyrinthKeyActivator::BeginPlay()
 		SetLabyrinthKey();
 	}
 }
-
-void ACSLabyrinthKeyActivator::SetActorActive(AActor* Actor, bool bActive)
-{
-	Actor->SetActorHiddenInGame(!bActive);
-	Actor->SetActorEnableCollision(bActive);
-	//SetActorTickEnabled(bActive);
-}
-
 void ACSLabyrinthKeyActivator::SetLabyrinthKey()
 {
 	for (TActorIterator<ACSLabyrinthKey> It(GetWorld()); It; ++It)
@@ -39,7 +34,6 @@ void ACSLabyrinthKeyActivator::SetLabyrinthKey()
 
 		if ( LabyrinthKey )
 		{
-			SetActorActive(LabyrinthKey, false);
 			Keys.Emplace(LabyrinthKey);
 		}
 	}
@@ -63,7 +57,7 @@ void ACSLabyrinthKeyActivator::SetLabyrinthKey()
 			continue;
 		}
 
-		SetActorActive(Keys[Idx], true);
+		Keys[Idx]->SetActive(true);
 
 		++ActivatedKeysCount;
 	}
