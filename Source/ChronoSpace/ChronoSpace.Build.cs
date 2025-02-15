@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class ChronoSpace : ModuleRules
 {
@@ -10,7 +11,7 @@ public class ChronoSpace : ModuleRules
 
         PublicIncludePaths.AddRange(new string[] { "ChronoSpace" });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "NavigationSystem", "UMG", "GameplayTasks" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] 
 		{

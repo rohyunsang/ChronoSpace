@@ -331,7 +331,7 @@ void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCo
 	{
 		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
 
-		if (OverlappedCharacter)
+		if ( OverlappedCharacter )
 		{
 			CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
 		}
