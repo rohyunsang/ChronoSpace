@@ -235,7 +235,6 @@ void ACSCharacterPlayer::BeginPlay()
 	
 	if (!IsLocallyControlled())
 	{
-		//EnergyBar->SetVisibility(false);
 		return;
 	}
 
@@ -298,6 +297,7 @@ void ACSCharacterPlayer::SetASC()
 	{
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
+		ASC->ReplicationMode = EGameplayEffectReplicationMode::Mixed;
 		//UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 	}
 	else
