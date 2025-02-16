@@ -4,9 +4,8 @@
 #include "Attribute/CSAttributeSet.h"
 #include "ChronoSpace.h"
 #include "GameplayEffectExtension.h"
+#include "Player/CSPlayerController.h"
 #include "CoreMinimal.h"
-
-
 
 UCSAttributeSet::UCSAttributeSet() : MaxEnergy(100.0f), Damage(0.0f)
 {
@@ -45,5 +44,18 @@ void UCSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	{
 		UE_LOG(LogCS, Log, TEXT("Damage Detected : %f"), GetDamage());
 		SetEnergy(FMath::Clamp(GetEnergy() - GetDamage(), MinimumEnergy, GetMaxEnergy()));
+
+		AActor* TargetActor = Data.Target.GetAvatarActor();
+		if (TargetActor == nullptr) return;
+
+		if (APawn* Pawn = Cast<APawn>(TargetActor))
+		{
+			ACSPlayerController* PC = Cast<ACSPlayerController>(Pawn->GetController());
+
+			if (PC)
+			{
+				PC->ShakeCamera();
+			}
+		}
 	}
 }
