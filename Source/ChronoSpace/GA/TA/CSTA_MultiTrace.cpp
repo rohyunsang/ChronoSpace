@@ -1,27 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GA/TA/CSTA_ReverseGravityTrace.h"
+#include "GA/TA/CSTA_MultiTrace.h"
 #include "Abilities/GameplayAbility.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
-#include "Physics/CSCollision.h"
 #include "DrawDebugHelpers.h"
-#include "AbilitySystemComponent.h"
-#include "AbilitySystemBlueprintLibrary.h"
-#include "ChronoSpace.h"
+#include "Physics/CSCollision.h"
 
-ACSTA_ReverseGravityTrace::ACSTA_ReverseGravityTrace()
+ACSTA_MultiTrace::ACSTA_MultiTrace()
 {
+	bShowDebug = true;
 }
 
-void ACSTA_ReverseGravityTrace::StartTargeting(UGameplayAbility* Ability)
+void ACSTA_MultiTrace::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
 	SourceActor = Ability->GetCurrentActorInfo()->AvatarActor.Get();
 }
 
-void ACSTA_ReverseGravityTrace::ConfirmTargetingAndContinue()
+void ACSTA_MultiTrace::ConfirmTargetingAndContinue()
 {
 	if (SourceActor)
 	{
@@ -30,17 +29,12 @@ void ACSTA_ReverseGravityTrace::ConfirmTargetingAndContinue()
 	}
 }
 
-FGameplayAbilityTargetDataHandle ACSTA_ReverseGravityTrace::MakeTargetData() const
+FGameplayAbilityTargetDataHandle ACSTA_MultiTrace::MakeTargetData() const
 {
 	ACharacter* Character = CastChecked<ACharacter>(SourceActor);
 
 	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceActor);
-
-	if (!ASC)
-	{
-		UE_LOG(LogCS, Log, TEXT("ASC Not Found"));
-		return FGameplayAbilityTargetDataHandle();
-	}
+	if (ASC == nullptr) return FGameplayAbilityTargetDataHandle();
 	
 	TArray< FHitResult > OutHitResults;
 	const float AttackRange = 50.0f;
@@ -56,7 +50,7 @@ FGameplayAbilityTargetDataHandle ACSTA_ReverseGravityTrace::MakeTargetData() con
 	FGameplayAbilityTargetDataHandle DataHandle;
 	if (HitDetected)
 	{
-		for (const auto OutHitResult : OutHitResults)
+		for (auto OutHitResult : OutHitResults)
 		{
 			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
 			DataHandle.Add(TargetData);

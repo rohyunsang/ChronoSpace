@@ -8,25 +8,25 @@
 
 
 
-UCSAttributeSet::UCSAttributeSet() : MaxEnergy(100.0f)
+UCSAttributeSet::UCSAttributeSet() : MaxEnergy(100.0f), Damage(0.0f)
 {
 	InitEnergy(GetMaxEnergy());
 }
 
 void UCSAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
-	/*
+	
 	if (Attribute == GetDamageAttribute())
 	{
 		NewValue = NewValue < 0.0f ? 0.0f : NewValue;
 	}
-	*/
+	
 	// -> 최소 데미지 0.0f 으로 설정. 
 }
 
 bool UCSAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
 {
-	return false;
+	return true;
 }
 
 void UCSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -39,5 +39,11 @@ void UCSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Direct Health Access : %f"), GetEnergy());
 		SetEnergy(FMath::Clamp(GetEnergy(), MinimumEnergy, GetMaxEnergy()));
+	}
+
+	if ( Data.EvaluatedData.Attribute == GetDamageAttribute() )
+	{
+		UE_LOG(LogCS, Log, TEXT("Damage Detected : %f"), GetDamage());
+		SetEnergy(FMath::Clamp(GetEnergy() - GetDamage(), MinimumEnergy, GetMaxEnergy()));
 	}
 }

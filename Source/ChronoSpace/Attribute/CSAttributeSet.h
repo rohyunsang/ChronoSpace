@@ -29,6 +29,7 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS(UCSAttributeSet, MaxEnergy);
+	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Damage);
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	//virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
@@ -41,5 +42,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxEnergy;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Damage;
 	
 };

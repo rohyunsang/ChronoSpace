@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "CSAT_ReverseGravityTrace.generated.h"
+#include "CSAT_MultiTrace.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTraceResultDelegate, const FGameplayAbilityTargetDataHandle&, TargetDataHandle);
 
@@ -12,15 +12,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTraceResultDelegate, const FGamepla
  * 
  */
 UCLASS()
-class CHRONOSPACE_API UCSAT_ReverseGravityTrace : public UAbilityTask
+class CHRONOSPACE_API UCSAT_MultiTrace : public UAbilityTask
 {
 	GENERATED_BODY()
 	
 public:
-	UCSAT_ReverseGravityTrace();
+	UCSAT_MultiTrace();
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (DisplayName = "ReverseGravity", HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UCSAT_ReverseGravityTrace* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_ReverseGravityTrace> TargetActorClass);
+	static UCSAT_MultiTrace* CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<class ACSTA_MultiTrace> TargetActorClass);
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool AbilityEnded) override;
@@ -35,8 +35,8 @@ protected:
 	void OnTargetDataReadyCallback(const FGameplayAbilityTargetDataHandle& DataHandle);
 
 	UPROPERTY()
-	TSubclassOf<class ACSTA_ReverseGravityTrace> TargetActorClass;
+	TSubclassOf<class ACSTA_MultiTrace> TargetActorClass;
 
 	UPROPERTY()
-	TObjectPtr<class ACSTA_ReverseGravityTrace> SpawnedTargetActor;
+	TObjectPtr<class ACSTA_MultiTrace> SpawnedTargetActor;
 };

@@ -25,6 +25,7 @@ public:
 	virtual class ACSCharacterPlayer* GetCharacterPlayer() override;
 
 protected:
+
 	UPROPERTY()
 	TObjectPtr<class ACSCharacterPlayer> Player;
 
@@ -49,4 +50,16 @@ protected:
 	TObjectPtr<class ACSCharacterPlayer> CharacterPlayer;
 
 	int32 OverlappedPlayerCount;
+
+// ASC Section
+public:
+	UFUNCTION()
+	void ActivateGiveDamage();
+
+protected:
+	UPROPERTY()
+	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	UPROPERTY()
+	TObjectPtr<class UCSAttributeSet> AttributeSet;
 };

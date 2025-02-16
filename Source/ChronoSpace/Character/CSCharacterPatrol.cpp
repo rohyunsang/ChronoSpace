@@ -10,6 +10,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 #include "Character/CSCharacterPlayer.h"
+#include "AbilitySystemComponent.h"
+#include "Attribute/CSAttributeSet.h"
+#include "GA/CSGA_GiveDamage.h"
 
 ACSCharacterPatrol::ACSCharacterPatrol()
 {
@@ -30,6 +33,11 @@ ACSCharacterPatrol::ACSCharacterPatrol()
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerEndOverlap);
 	Trigger->bVisualizeComponent = true;
+
+	// ASC
+	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	ASC->SetIsReplicated(true);
+	AttributeSet = CreateDefaultSubobject<UCSAttributeSet>(TEXT("AttributeSet"));
 }
 
 FVector ACSCharacterPatrol::GetPatrolPos()
@@ -37,7 +45,15 @@ FVector ACSCharacterPatrol::GetPatrolPos()
 	int8 PrevIdx = CurrentPatrolIdx;
 	CurrentPatrolIdx = (CurrentPatrolIdx + 1) % PatrolPosesLength;
 	//UE_LOG(LogCS, Log, TEXT("%d"), CurrentPatrolIdx);
-	return PatrolPoses[PrevIdx];
+
+	if ( PatrolPoses.IsValidIndex(PrevIdx) )
+	{
+		return PatrolPoses[PrevIdx];
+	}
+	else
+	{
+		return FVector(0.0f, 0.0f, 0.0f);
+	}
 }
 
 void ACSCharacterPatrol::BeginPlay()
@@ -45,6 +61,12 @@ void ACSCharacterPatrol::BeginPlay()
 	Super::BeginPlay();
 
 	PatrolPosesLength = PatrolPoses.Num();
+
+	if ( ASC )
+	{
+		FGameplayAbilitySpec DamageSpec( UCSGA_GiveDamage::StaticClass() );
+		ASC->GiveAbility(FGameplayAbilitySpec(DamageSpec));
+	}
 }
 
 ACSCharacterPlayer* ACSCharacterPatrol::GetCharacterPlayer()
@@ -84,3 +106,13 @@ void ACSCharacterPatrol::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComp
 		}
 	}
 }
+
+void ACSCharacterPatrol::ActivateGiveDamage()
+{
+	if ( ASC )
+	{
+		ASC->TryActivateAbilityByClass( UCSGA_GiveDamage::StaticClass() );
+	}
+}
+
+
