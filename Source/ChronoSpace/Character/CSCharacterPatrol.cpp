@@ -60,12 +60,15 @@ void ACSCharacterPatrol::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PatrolPosesLength = PatrolPoses.Num();
-
-	if ( ASC )
+	if ( HasAuthority() )
 	{
-		FGameplayAbilitySpec DamageSpec( UCSGA_GiveDamage::StaticClass() );
-		ASC->GiveAbility(FGameplayAbilitySpec(DamageSpec));
+		PatrolPosesLength = PatrolPoses.Num();
+
+		if (ASC)
+		{
+			FGameplayAbilitySpec DamageSpec(UCSGA_GiveDamage::StaticClass());
+			ASC->GiveAbility(FGameplayAbilitySpec(DamageSpec));
+		}
 	}
 }
 
@@ -76,40 +79,46 @@ ACSCharacterPlayer* ACSCharacterPatrol::GetCharacterPlayer()
 
 void ACSCharacterPatrol::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
-	ACSCharacterPlayer* OverlappedPlayer = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if ( OverlappedPlayer )
+	if ( HasAuthority() )
 	{
-		CharacterPlayer = OverlappedPlayer;
-		Cast<ACSAIController>(GetController())->ActiveMove(false);
-		++OverlappedPlayerCount;
-	}
+		ACSCharacterPlayer* OverlappedPlayer = Cast<ACSCharacterPlayer>(OtherActor);
+
+		if (OverlappedPlayer)
+		{
+			CharacterPlayer = OverlappedPlayer;
+			Cast<ACSAIController>(GetController())->ActiveMove(false);
+			++OverlappedPlayerCount;
+		}
+	}	
 }
 
 void ACSCharacterPatrol::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ACSCharacterPlayer* OverlappedPlayer = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if (OverlappedPlayer)
+	if ( HasAuthority() )
 	{
-		--OverlappedPlayerCount;
-		if ( OverlappedPlayerCount > 0 )
+		ACSCharacterPlayer* OverlappedPlayer = Cast<ACSCharacterPlayer>(OtherActor);
+
+		if (OverlappedPlayer)
 		{
-			OverlappedPlayerCount = 0;
-			Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			Trigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		}
-		else
-		{
-			Cast<ACSAIController>(GetController())->ActiveMove(true);
-			CharacterPlayer = nullptr;
+			--OverlappedPlayerCount;
+			if (OverlappedPlayerCount > 0)
+			{
+				OverlappedPlayerCount = 0;
+				Trigger->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Trigger->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			}
+			else
+			{
+				Cast<ACSAIController>(GetController())->ActiveMove(true);
+				CharacterPlayer = nullptr;
+			}
 		}
 	}
 }
 
 void ACSCharacterPatrol::ActivateGiveDamage()
 {
-	if ( ASC )
+	if ( HasAuthority() && ASC )
 	{
 		ASC->TryActivateAbilityByClass( UCSGA_GiveDamage::StaticClass() );
 	}
