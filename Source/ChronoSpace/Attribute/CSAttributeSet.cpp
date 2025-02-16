@@ -15,7 +15,6 @@ UCSAttributeSet::UCSAttributeSet() : MaxEnergy(100.0f), Damage(0.0f)
 
 void UCSAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
-	
 	if (Attribute == GetDamageAttribute())
 	{
 		NewValue = NewValue < 0.0f ? 0.0f : NewValue;
@@ -44,7 +43,8 @@ void UCSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 	if ( Data.EvaluatedData.Attribute == GetDamageAttribute() )
 	{
 		SetEnergy(FMath::Clamp(GetEnergy() - GetDamage(), MinimumEnergy, GetMaxEnergy()));
-		UE_LOG(LogCS, Log, TEXT("[NetMode : %d] Damage Detected : %f | Now Energy : %f"), GetWorld()->GetNetMode(), GetDamage(), GetEnergy());
+		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] Damage Detected : %f | Now Energy : %f"), GetWorld()->GetNetMode(), GetDamage(), GetEnergy());
+
 		AActor* TargetActor = Data.Target.GetAvatarActor();
 		if (TargetActor == nullptr) return;
 
