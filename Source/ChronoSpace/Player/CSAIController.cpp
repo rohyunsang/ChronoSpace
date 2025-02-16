@@ -7,7 +7,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "ChronoSpace.h"
 
-const FName ACSAIController::PlayerPosKey(TEXT("PlayerPos"));
+const FName ACSAIController::PlayerKey(TEXT("Player"));
 const FName ACSAIController::PatrolPosKey(TEXT("PatrolPos"));
 const FName ACSAIController::bShouldStopMoveKey(TEXT("bShouldStopMove"));
 

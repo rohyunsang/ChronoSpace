@@ -22,7 +22,7 @@ public:
 
 	void ActiveMove(bool bIsActive);
 
-	static const FName PlayerPosKey;
+	static const FName PlayerKey;
 	static const FName PatrolPosKey;
 	static const FName bShouldStopMoveKey;
 	

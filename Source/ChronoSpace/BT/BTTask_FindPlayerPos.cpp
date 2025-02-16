@@ -24,7 +24,7 @@ EBTNodeResult::Type UBTTask_FindPlayerPos::ExecuteTask(UBehaviorTreeComponent& O
 
 		if ( Player )
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(ACSAIController::PlayerPosKey, Player->GetActorLocation());
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(ACSAIController::PlayerKey, Player);
 
 			return EBTNodeResult::Succeeded;
 		}
