@@ -19,6 +19,12 @@ ACSCharacterPatrol::ACSCharacterPatrol()
 {
 	GetMesh()->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
 
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/SK_Chibi_Skullboy.SK_Chibi_Skullboy'"));
+	if (CharacterMeshRef.Object)
+	{
+		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	}
+
 	AIControllerClass = ACSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCharacterMovement()->GetNavMovementProperties()->bUseAccelerationForPaths = true;
