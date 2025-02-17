@@ -177,10 +177,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
 	int32 MaxHistorySize = 99; // 3�� ������ Transform ��� (0.03�� ����)
 
-	// ���� Transform�� ���
 	void RecordTransform();
-
-	float TimeSinceLastRecord = 0.0f; // ������ ��� ���� ��� �ð�
 
 // Interaction Section
 public:
@@ -190,4 +187,7 @@ public:
 	void ServerInteract();
 
 	void Interact();
+
+	float TimeSinceLastRecord = 0.0f; 
+
 };
