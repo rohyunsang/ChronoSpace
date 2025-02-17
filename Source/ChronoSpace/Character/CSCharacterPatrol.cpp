@@ -12,10 +12,13 @@
 #include "Character/CSCharacterPlayer.h"
 #include "AbilitySystemComponent.h"
 #include "Attribute/CSAttributeSet.h"
+#include "Components/StaticMeshComponent.h"
 #include "GA/CSGA_GiveDamage.h"
 
 ACSCharacterPatrol::ACSCharacterPatrol()
 {
+	GetMesh()->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
+
 	AIControllerClass = ACSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCharacterMovement()->GetNavMovementProperties()->bUseAccelerationForPaths = true;
