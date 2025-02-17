@@ -33,7 +33,7 @@ void UCSCustomGravityDirComponent::BeginPlay()
 
 		if ( OwnerCharacter->HasAuthority() )
 		{
-			GetWorld()->GetTimerManager().SetTimer(GravityCheckTimerHandle, this, &UCSCustomGravityDirComponent::CheckGravity, 0.3f, true);
+			GetWorld()->GetTimerManager().SetTimer(GravityCheckTimerHandle, this, &UCSCustomGravityDirComponent::CheckGravity, 0.1f, true);
 		}
 	}
 }

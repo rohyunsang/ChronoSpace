@@ -114,6 +114,13 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		TimeRewindAction = InputActionTimeRewindRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionInteractRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Interact.IA_Interact'"));
+	if (nullptr != InputActionInteractRef.Object)
+	{
+		InteractAction = InputActionInteractRef.Object;
+	}
+
+
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
 	EnergyBar->SetupAttachment(GetMesh());
@@ -163,6 +170,23 @@ void ACSCharacterPlayer::RecordTransform()
 	TransformHistory.Add(FrameData);
 }
 
+void ACSCharacterPlayer::ServerInteract_Implementation()
+{
+	OnInteract.Broadcast();
+}
+
+void ACSCharacterPlayer::Interact()
+{
+	if ( HasAuthority() )
+	{
+		OnInteract.Broadcast();
+	}
+	else
+	{
+		ServerInteract();
+	}
+}
+
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 {
@@ -187,6 +211,8 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
+
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::Interact);
 
 	SetupGASInputComponent();
 }
@@ -213,7 +239,6 @@ void ACSCharacterPlayer::BeginPlay()
 	
 	if (!IsLocallyControlled())
 	{
-		//EnergyBar->SetVisibility(false);
 		return;
 	}
 
@@ -277,6 +302,7 @@ void ACSCharacterPlayer::SetASC()
 	{
 		ASC = CSPS->GetAbilitySystemComponent();
 		ASC->InitAbilityActorInfo(CSPS, this);
+		ASC->ReplicationMode = EGameplayEffectReplicationMode::Mixed;
 		//UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 	}
 	else
@@ -310,7 +336,7 @@ void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCo
 	{
 		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
 
-		if (OverlappedCharacter)
+		if ( OverlappedCharacter )
 		{
 			CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
 		}

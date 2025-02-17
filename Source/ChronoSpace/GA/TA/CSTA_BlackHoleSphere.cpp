@@ -12,6 +12,7 @@
 #include "Actor/CSWhiteHall.h"
 #include "Physics/CSCollision.h"
 #include "Kismet/GameplayStatics.h"
+#include "Character/CSCharacterPatrol.h"
 #include "ChronoSpace.h"
 
 ACSTA_BlackHoleSphere::ACSTA_BlackHoleSphere()
@@ -139,6 +140,12 @@ void ACSTA_BlackHoleSphere::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedC
 
 void ACSTA_BlackHoleSphere::OnEventHorizonBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
+	// Patrol¿Ã »≠¿Ã∆Æ»¶ø° »÷∏ª∏Æ∏È NavMesh ≤ø¿œ ºˆ ¿÷¿Ω
+	if ( ACSCharacterPatrol* Patrol = Cast<ACSCharacterPatrol>(OtherActor) )
+	{
+		return;
+	}
+
 	ACharacter* OverlapedCharacter = Cast<ACharacter>(OtherActor);
 	ACSCharacterPlayer* OverlapedCharacterPlayer = Cast<ACSCharacterPlayer>(OtherActor);
 

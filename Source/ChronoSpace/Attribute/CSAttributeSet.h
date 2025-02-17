@@ -29,6 +29,7 @@ public:
 
 	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Energy);
 	ATTRIBUTE_ACCESSORS(UCSAttributeSet, MaxEnergy);
+	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Damage);
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	//virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
@@ -36,10 +37,20 @@ public:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Energy", ReplicatedUsing = OnRep_Energy, Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Energy;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
+	UPROPERTY(BlueprintReadOnly, Category = "Energy", ReplicatedUsing = OnRep_MaxEnergy, Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxEnergy;
-	
+
+	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Damage;
+
+	UFUNCTION()
+	void OnRep_Energy(const FGameplayAttributeData& OldEnergy);
+
+	UFUNCTION()
+	void OnRep_MaxEnergy(const FGameplayAttributeData& OldMaxEnergy);
 };

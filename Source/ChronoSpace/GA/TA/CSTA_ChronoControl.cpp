@@ -14,6 +14,7 @@
 
 ACSTA_ChronoControl::ACSTA_ChronoControl()
 {
+    bReplicates = true;
     bShowDebug = false;
 
     // Trigger

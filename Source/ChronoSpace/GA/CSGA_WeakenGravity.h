@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class CHRONOSPACE_API UCSGA_WeakenGravity : public UGameplayAbility
 {
 	GENERATED_BODY()

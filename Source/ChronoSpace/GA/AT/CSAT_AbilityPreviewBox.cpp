@@ -77,6 +77,7 @@ void UCSAT_AbilityPreviewBox::CreateStaticMesh()
     StaticMeshComp = NewObject<UStaticMeshComponent>(GetWorld()->GetFirstPlayerController()->GetPawn());
     if (StaticMeshComp)
     {
+        StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         StaticMeshComp->RegisterComponent();
         StaticMeshComp->AttachToComponent(PreviewBox, FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -98,13 +99,48 @@ void UCSAT_AbilityPreviewBox::CreateStaticMesh()
         StaticMeshComp->SetRelativeScale3D(MeshScale);
 
         // 런타임에서 메테리얼 로드
-        UMaterial* MaterialRef = Cast<UMaterial>(
-            StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_ChronoControlPreview.MAT_ChronoControlPreview"))
-        );
-        if (MaterialRef)
+        if ( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::ChronoControl )
         {
-            SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_ChronoControlPreview.MAT_ChronoControlPreview"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
         }
+        else if( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::ReverseGravity )
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_AntyGravityPreview.MAT_AntyGravityPreview"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+        else if ( Cast<UCSGA_AbilityPreviewBox>(Ability)->Ability == EAbilityIndex::WeakenGravity50P )
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_WeakenGravityPreview50P.MAT_WeakenGravityPreview50P"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+        else
+        {
+            UMaterial* MaterialRef = Cast<UMaterial>(
+                StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Material/MAT_WeakenGravityPreview10P.MAT_WeakenGravityPreview10P"))
+            );
+            if (MaterialRef)
+            {
+                SetSteticMeshMaterial(MaterialRef, MeshScale.X);
+            }
+        }
+
+        
     }
 }
 void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
@@ -146,10 +182,9 @@ void UCSAT_AbilityPreviewBox::PlayerFollowPreviewBox()
 
     // ForwardVector와 RightVector를 기반으로 PlayerOffset 계산
     FVector ForwardOffset = ForwardVector * 350.0f; // 플레이어 앞 방향으로 350 단위
-    FVector RightOffset = RightVector * YOffset;   // 오른쪽 방향으로 YOffset 만큼 이동
-    FVector UpOffset(0.0f, 0.0f, 100.0f);          // 위쪽으로 100 단위
+    FVector UpOffset(0.0f, 0.0f, 100.0f + (CurrentSize - 200.0f));          // 위쪽으로 100 단위
 
-    FVector NewLocation = ActorLocation + ForwardOffset + RightOffset + UpOffset;
+    FVector NewLocation = ActorLocation + ForwardOffset /*+ RightOffset*/ + UpOffset;
 
     // 박스 위치 업데이트
     PreviewBox->SetWorldLocation(NewLocation);
@@ -215,8 +250,11 @@ void UCSAT_AbilityPreviewBox::AdjustPreviewBoxScale(bool bIncrease)
     PreviewBox->SetBoxExtent(NewExtent);
 
     // Static Mesh 크기도 변경
-    FVector MeshScale = NewExtent / 50.0f; // 기본 박스 크기를 기준으로 스케일 계산
+    float HalfSizeOfSide = 50.0f;
+    FVector MeshScale = NewExtent / HalfSizeOfSide; // 기본 박스 크기를 기준으로 스케일 계산
     StaticMeshComp->SetRelativeScale3D(MeshScale);
+    FVector LocationOffset = FVector(-HalfSizeOfSide, -HalfSizeOfSide, -HalfSizeOfSide);
+    StaticMeshComp->SetRelativeLocation(LocationOffset * MeshScale);
 
     UE_LOG(LogTemp, Log, TEXT("PreviewBox Scale Adjusted: Current Size: %.2f, New Size: %.2f"), CurrentSize, NewSize);
     UE_LOG(LogTemp, Log, TEXT("PreviewBox Adjusted Extent: X=%.2f, Y=%.2f, Z=%.2f"), NewExtent.X, NewExtent.Y, NewExtent.Z);

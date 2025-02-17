@@ -9,6 +9,8 @@
 #include "CSF_CharacterFrameData.h"
 #include "CSCharacterPlayer.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
+
 UENUM()
 enum class EAbilityIndex : uint8
 {
@@ -102,6 +104,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> TimeRewindAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InteractAction;
+
 // ASC Section
 protected:
 	void SetupGASInputComponent();
@@ -174,5 +179,15 @@ protected:
 
 	void RecordTransform();
 
+// Interaction Section
+public:
+	FInteractionDelegate OnInteract;
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteract();
+
+	void Interact();
+
 	float TimeSinceLastRecord = 0.0f; 
+
 };

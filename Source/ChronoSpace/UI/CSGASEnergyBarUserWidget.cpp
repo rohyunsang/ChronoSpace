@@ -20,7 +20,7 @@ void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 		ASC->GetGameplayAttributeValueChangeDelegate(UCSAttributeSet::GetEnergyAttribute()).AddUObject(this, &UCSGASEnergyBarUserWidget::OnEnergyChanged);
 		ASC->GetGameplayAttributeValueChangeDelegate(UCSAttributeSet::GetMaxEnergyAttribute()).AddUObject(this, &UCSGASEnergyBarUserWidget::OnMaxEnergyChanged);
 		PbEnergyBar->SetFillColorAndOpacity(EnergyColor);
-		
+		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] SetAbilitySystemComponent"), GetWorld()->GetNetMode());
 		const UCSAttributeSet* CurrentAttributeSet = ASC->GetSet<UCSAttributeSet>();
 		
 		if (CurrentAttributeSet)
@@ -50,6 +50,7 @@ void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 
 void UCSGASEnergyBarUserWidget::OnEnergyChanged(const FOnAttributeChangeData& ChangeData)
 {
+	UE_LOG(LogCS, Log, TEXT("[NetMode %d]OnEnergyChanged"), GetWorld()->GetNetMode());
 	CurrentEnergy = ChangeData.NewValue;
 	UpdateEnergyBar();
 }
