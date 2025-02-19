@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/CSInteractionInterface.h"
 #include "CSLabyrinthKey.generated.h"
 
 UCLASS()
-class CHRONOSPACE_API ACSLabyrinthKey : public AActor
+class CHRONOSPACE_API ACSLabyrinthKey : public AActor, public ICSInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -17,14 +18,9 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_bIsActive)
 	bool bIsActive;
 
-	UFUNCTION()
-	void OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
-
-	UFUNCTION()
-	void OnTriggerEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-	void Interact();
+	virtual void BeginInteraction() override;
+	virtual void EndInteraction() override;
+	virtual void Interact() override;
 
 	void SetActive(bool bActive);
 
@@ -43,5 +39,5 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	float TriggerRange = 100.0f;
+	float TriggerRange = 80.0f;
 };

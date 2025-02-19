@@ -9,7 +9,7 @@
 #include "CSF_CharacterFrameData.h"
 #include "CSCharacterPlayer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
 
 UENUM()
 enum class EAbilityIndex : uint8
@@ -181,12 +181,18 @@ protected:
 
 // Interaction Section
 public:
-	FInteractionDelegate OnInteract;
+	UPROPERTY()
+	TObjectPtr<class UCSPlayerInteractionComponent> InteractionComponent;
+
+	//FInteractionDelegate OnInteract;
 
 	UFUNCTION(Server, Reliable)
 	void ServerInteract();
 
 	void Interact();
+	void EndInteract();
+
+	bool bIsInteracted;
 
 	float TimeSinceLastRecord = 0.0f; 
 

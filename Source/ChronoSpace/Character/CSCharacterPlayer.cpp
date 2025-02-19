@@ -21,12 +21,15 @@
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "ChronoSpace.h"
-
+#include "Character/CSCharacterPatrol.h"
+#include "ActorComponent/CSPlayerInteractionComponent.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
 	bReplicates = true;
+
+	bIsInteracted = false;
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -150,12 +153,14 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	// Trigger
 	Trigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger"));
 	Trigger->InitCapsuleSize(50.f, 100.0f);
-	Trigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
+	Trigger->SetCollisionProfileName( CPROFILE_OVERLAPALL );
 	Trigger->SetupAttachment(GetCapsuleComponent());
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
 
+	InteractionComponent = CreateDefaultSubobject<UCSPlayerInteractionComponent>(TEXT("InteractionComponent"));
+	InteractionComponent->SetTrigger(Trigger);
 }
 
 
@@ -172,19 +177,27 @@ void ACSCharacterPlayer::RecordTransform()
 
 void ACSCharacterPlayer::ServerInteract_Implementation()
 {
-	OnInteract.Broadcast();
+	InteractionComponent->ExecInteraction();
 }
 
 void ACSCharacterPlayer::Interact()
 {
+	if (bIsInteracted) return;
+
 	if ( HasAuthority() )
 	{
-		OnInteract.Broadcast();
+		InteractionComponent->ExecInteraction();
 	}
 	else
 	{
 		ServerInteract();
 	}
+	bIsInteracted = true;
+}
+
+void ACSCharacterPlayer::EndInteract()
+{
+	bIsInteracted = false;
 }
 
 
@@ -213,6 +226,7 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
 
 	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::Interact);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::EndInteract);
 
 	SetupGASInputComponent();
 }
@@ -332,7 +346,8 @@ void ACSCharacterPlayer::SetGASAbilities()
 
 void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
 {
-	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor))
+	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor) && 
+		nullptr == Cast<ACSCharacterPatrol>(OtherActor))
 	{
 		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
 
