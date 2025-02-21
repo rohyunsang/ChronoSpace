@@ -21,6 +21,7 @@ UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
 void UCSCustomGravityDirComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 
 	if ( GetOwner() )
 	{
