@@ -78,7 +78,6 @@ void UCSPlayerInteractionComponent::ExecInteraction()
 {
 	if ( CurrentInteractionActor )
 	{
-		UE_LOG(LogCS, Log, TEXT("ExecInteraction"));
 		ICSInteractionInterface* Interaction = Cast<ICSInteractionInterface>(CurrentInteractionActor);
 		Interaction->Interact();
 	}

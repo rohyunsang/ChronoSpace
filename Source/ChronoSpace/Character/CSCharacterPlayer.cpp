@@ -284,6 +284,11 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 
 	FVector ForwardDirection = GetMesh()->GetComponentRotation().Vector();
 	FVector Power = FVector(10000.0f, 10000.0f, 0.0f);
+	if ( GetCharacterMovement()->GetGravityDirection().Z > 0.0f )
+	{
+		Power *= -1.0f;
+	}
+
 	Power.X *= -ForwardDirection.Y;
 	Power.Y *= ForwardDirection.X;
 
@@ -291,6 +296,7 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 	{
 		if ( IsValid(Char.Value()) )
 		{
+			UE_LOG(LogCS, Log, TEXT("Pushing!"));
 			Char.Value()->GetCharacterMovement()->AddImpulse(Power); 
 		}
 	} 

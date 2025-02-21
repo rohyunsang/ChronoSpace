@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Actor/CSGravityCore.h"
+#include "Engine/World.h"
 #include "ChronoSpace.h"
 
 UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
@@ -30,7 +31,7 @@ void UCSCustomGravityDirComponent::BeginPlay()
 			OwnerCharacter->OnActorBeginOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorBeginOverlapCallback);
 			OwnerCharacter->OnActorEndOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorEndOverlapCallback);
 		}
-
+		
 		if ( OwnerCharacter->HasAuthority() )
 		{
 			GetWorld()->GetTimerManager().SetTimer(GravityCheckTimerHandle, this, &UCSCustomGravityDirComponent::CheckGravity, 0.1f, true);
