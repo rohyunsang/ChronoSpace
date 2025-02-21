@@ -9,10 +9,11 @@
 #include "Engine/World.h"
 #include "ChronoSpace.h"
 
+FVector UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
+
 UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
 {
 	SetIsReplicatedByDefault(true);
-	OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 }
 
 

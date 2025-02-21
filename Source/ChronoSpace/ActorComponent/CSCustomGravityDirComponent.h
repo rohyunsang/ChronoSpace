@@ -14,6 +14,8 @@ class CHRONOSPACE_API UCSCustomGravityDirComponent : public UActorComponent
 
 public:	
 	UCSCustomGravityDirComponent();
+	
+	static FVector OrgGravityDirection;
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,8 +34,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<class ACharacter> OwnerCharacter;
-
-	FVector OrgGravityDirection;
 
 protected:
 	UFUNCTION()

@@ -21,8 +21,8 @@
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "ChronoSpace.h"
-#include "Character/CSCharacterPatrol.h"
 #include "ActorComponent/CSPlayerInteractionComponent.h"
+#include "ActorComponent/CSPushingCharacterComponent.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -156,8 +156,9 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetCollisionProfileName( CPROFILE_OVERLAPALL );
 	Trigger->SetupAttachment(GetCapsuleComponent());
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerBeginOverlap);
-	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPlayer::OnTriggerEndOverlap);
+
+	PushingCharacterComponent = CreateDefaultSubobject<UCSPushingCharacterComponent>(TEXT("PushingCharacterComponent"));
+	PushingCharacterComponent->SetTrigger(Trigger);
 
 	InteractionComponent = CreateDefaultSubobject<UCSPlayerInteractionComponent>(TEXT("InteractionComponent"));
 	InteractionComponent->SetTrigger(Trigger);
@@ -234,11 +235,9 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 void ACSCharacterPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	// UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] OnRep_PlayerState, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 
 	SetASC();
 	EnergyBar->ActivateGAS();
-	// UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] OnRep_PlayerState, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
 }
 
 void ACSCharacterPlayer::BeginPlay()
@@ -262,7 +261,6 @@ void ACSCharacterPlayer::BeginPlay()
 		Subsystem->AddMappingContext(MappingContext, 0);
 	}
 
-
 	AttachWindUpKeyToSocket();
 }
 
@@ -275,30 +273,6 @@ void ACSCharacterPlayer::Tick(float DeltaSeconds)
 	{
 		RecordTransform();
 		TimeSinceLastRecord = 0.0f;
-	}
-
-	if ( GetCharacterMovement()->Velocity.IsNearlyZero() )
-	{
-		return;
-	}
-
-	FVector ForwardDirection = GetMesh()->GetComponentRotation().Vector();
-	FVector Power = FVector(10000.0f, 10000.0f, 0.0f);
-	if ( GetCharacterMovement()->GetGravityDirection().Z > 0.0f )
-	{
-		Power *= -1.0f;
-	}
-
-	Power.X *= -ForwardDirection.Y;
-	Power.Y *= ForwardDirection.X;
-
-	for (auto Char = CharsInPushing.CreateIterator(); Char; ++Char)
-	{
-		if ( IsValid(Char.Value()) )
-		{
-			UE_LOG(LogCS, Log, TEXT("Pushing!"));
-			Char.Value()->GetCharacterMovement()->AddImpulse(Power); 
-		}
 	} 
 } 
 
@@ -349,34 +323,6 @@ void ACSCharacterPlayer::SetGASAbilities()
 		}
 	}
 }
-
-void ACSCharacterPlayer::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
-{
-	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor) && 
-		nullptr == Cast<ACSCharacterPatrol>(OtherActor))
-	{
-		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
-
-		if ( OverlappedCharacter )
-		{
-			CharsInPushing.Emplace(OverlappedCharacter->GetFName(), OverlappedCharacter);
-		}
-	}	
-}
-
-void ACSCharacterPlayer::OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (nullptr == Cast<ACSCharacterPlayer>(OtherActor))
-	{
-		ACharacter* OverlappedCharacter = Cast<ACharacter>(OtherActor);
-
-		if (OverlappedCharacter)
-		{
-			CharsInPushing.Remove(OverlappedCharacter->GetFName());
-		}
-	}
-}
-
 
 void ACSCharacterPlayer::ShoulderMove(const FInputActionValue& Value)
 {

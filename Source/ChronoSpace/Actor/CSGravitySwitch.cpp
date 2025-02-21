@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ActorComponent/CSCustomGravityDirComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "ChronoSpace.h"
@@ -22,7 +23,19 @@ void ACSGravitySwitch::Interact()
 		ACharacter* Char = *It;
 		
 		FVector CharGravity = Char->GetCharacterMovement()->GetGravityDirection();
-		Char->GetCharacterMovement()->SetGravityDirection(-1.0f * CharGravity);
+
+		if ( bIsInteracted )
+		{
+			CharGravity.Z = FMath::Abs(CharGravity.Z);
+			UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, 1.0f);
+		}
+		else
+		{
+			CharGravity.Z = -1.0f * FMath::Abs(CharGravity.Z);
+			UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
+		}
+
+		Char->GetCharacterMovement()->SetGravityDirection(CharGravity);
 	}
 
 	for (TActorIterator<ACSGravitySwitch> It(GetWorld()); It; ++It)
