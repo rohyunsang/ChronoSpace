@@ -25,11 +25,11 @@ ACSLabyrinthKeyAltar::ACSLabyrinthKeyAltar()
 	StaticMeshComp->SetIsReplicated(true);
 
 	// SphereTrigger
-	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("GravitySphereTrigger"));
+	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereTrigger"));
 	SphereTrigger->SetSphereRadius(TriggerRange, true);
 	SphereTrigger->SetupAttachment(StaticMeshComp);
 	SphereTrigger->SetRelativeLocation(FVector(40.0f, 60.0f, 0.0f));
-	SphereTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
+	SphereTrigger->SetCollisionProfileName(CPROFILE_OVERLAPALL);
 	SphereTrigger->SetIsReplicated(true);
 
 
@@ -39,10 +39,9 @@ ACSLabyrinthKeyAltar::ACSLabyrinthKeyAltar()
 		StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
 	}
 
-	SphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSLabyrinthKeyAltar::OnTriggerBeginOverlapCallback);
-	SphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSLabyrinthKeyAltar::OnTriggerEndOverlapCallback);
+	//SphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSLabyrinthKeyAltar::OnComponentBeginOverlapCallback);
+	//SphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSLabyrinthKeyAltar::OnComponentEndOverlapCallback);
 
-	// Widget
 	InteractionPromptComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionPromptComponent"));
 	InteractionPromptComponent->SetupAttachment(SphereTrigger);
 	InteractionPromptComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f));
@@ -61,27 +60,14 @@ ACSLabyrinthKeyAltar::ACSLabyrinthKeyAltar()
 	RequiredKeyCount = 5;
 }
 
-void ACSLabyrinthKeyAltar::OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
+void ACSLabyrinthKeyAltar::BeginInteraction()
 {
-	ACSCharacterPlayer* Player = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if (Player)
-	{
-		Player->OnInteract.Clear();
-		InteractionPromptComponent->SetVisibility(true);
-		Player->OnInteract.AddDynamic(this, &ACSLabyrinthKeyAltar::Interact);
-	}
+	InteractionPromptComponent->SetVisibility(true);
 }
 
-void ACSLabyrinthKeyAltar::OnTriggerEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ACSLabyrinthKeyAltar::EndInteraction()
 {
-	ACSCharacterPlayer* Player = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if (Player)
-	{
-		InteractionPromptComponent->SetVisibility(false);
-		Player->OnInteract.Clear();
-	}
+	InteractionPromptComponent->SetVisibility(false);
 }
 
 void ACSLabyrinthKeyAltar::Interact()
@@ -95,6 +81,10 @@ void ACSLabyrinthKeyAltar::Interact()
 		if ( NowKeyCount >= RequiredKeyCount )
 		{
 			ChangeLevel();
+		}
+		else
+		{
+			UE_LOG(LogCS, Log, TEXT("Needs More Key"));
 		}
 	}
 }

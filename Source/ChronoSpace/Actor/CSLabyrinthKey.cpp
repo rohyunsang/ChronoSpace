@@ -16,21 +16,22 @@
 ACSLabyrinthKey::ACSLabyrinthKey()
 {
 	bReplicates = true;
-
-	// SphereTrigger
-	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("GravitySphereTrigger"));
-	SphereTrigger->SetSphereRadius(TriggerRange, true);
-	SphereTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	RootComponent = SphereTrigger;
-	SphereTrigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
-	SphereTrigger->SetIsReplicated(true);
+	bAlwaysRelevant = true;
 
 	// Static Mesh
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComp->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	StaticMeshComp->SetupAttachment(SphereTrigger);
+	RootComponent = StaticMeshComp;
 	StaticMeshComp->SetCollisionProfileName(CPROFILE_CSCAPSULE);
 	StaticMeshComp->SetIsReplicated(true);
+
+	// SphereTrigger
+	SphereTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("SphereTrigger"));
+	SphereTrigger->SetSphereRadius(TriggerRange, true);
+	SphereTrigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	SphereTrigger->SetupAttachment(RootComponent);
+	SphereTrigger->SetCollisionProfileName(CPROFILE_OVERLAPALL);
+	SphereTrigger->SetIsReplicated(true);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/StaticMesh/MapClockworkLabyrinth/Key/SM_SM_LabyrinthKey.SM_SM_LabyrinthKey'"));
 	if (StaticMeshRef.Object)
@@ -38,12 +39,9 @@ ACSLabyrinthKey::ACSLabyrinthKey()
 		StaticMeshComp->SetStaticMesh(StaticMeshRef.Object);
 	}
 
-	float MeshRadius = 50.0f;
+	/*float MeshRadius = 50.0f;
 	float MeshScale = (TriggerRange / MeshRadius) * 0.75f;
-	StaticMeshComp->SetRelativeScale3D(FVector(MeshScale, MeshScale, MeshScale));
-
-	SphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ACSLabyrinthKey::OnTriggerBeginOverlapCallback);
-	SphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ACSLabyrinthKey::OnTriggerEndOverlapCallback);
+	StaticMeshComp->SetRelativeScale3D(FVector(MeshScale, MeshScale, MeshScale));*/
 
 	// Widget
 	InteractionPromptComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionPromptComponent"));
@@ -64,27 +62,14 @@ ACSLabyrinthKey::ACSLabyrinthKey()
 	SetActive(false);
 }
 
-void ACSLabyrinthKey::OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
+void ACSLabyrinthKey::BeginInteraction()
 {
-	ACSCharacterPlayer* Player = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if ( Player )
-	{
-		Player->OnInteract.Clear();
-		InteractionPromptComponent->SetVisibility(true);
-		Player->OnInteract.AddDynamic(this, &ACSLabyrinthKey::Interact);
-	}
+	InteractionPromptComponent->SetVisibility(true);
 }
 
-void ACSLabyrinthKey::OnTriggerEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ACSLabyrinthKey::EndInteraction()
 {
-	ACSCharacterPlayer* Player = Cast<ACSCharacterPlayer>(OtherActor);
-
-	if (Player)
-	{
-		InteractionPromptComponent->SetVisibility(false);
-		Player->OnInteract.Clear();
-	}
+	InteractionPromptComponent->SetVisibility(false);
 }
 
 void ACSLabyrinthKey::Interact()

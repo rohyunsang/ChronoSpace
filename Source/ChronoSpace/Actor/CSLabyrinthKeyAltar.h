@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interface/CSInteractionInterface.h"
 #include "CSLabyrinthKeyAltar.generated.h"
 
 UCLASS()
-class CHRONOSPACE_API ACSLabyrinthKeyAltar : public AActor
+class CHRONOSPACE_API ACSLabyrinthKeyAltar : public AActor, public ICSInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -15,14 +16,9 @@ public:
 	// Sets default values for this actor's properties
 	ACSLabyrinthKeyAltar();
 
-	UFUNCTION()
-	void OnTriggerBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
-
-	UFUNCTION()
-	void OnTriggerEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UFUNCTION()
-	void Interact();
+	virtual void BeginInteraction() override;
+	virtual void EndInteraction() override;
+	virtual void Interact() override;
 
 protected:
 	void ChangeLevel();

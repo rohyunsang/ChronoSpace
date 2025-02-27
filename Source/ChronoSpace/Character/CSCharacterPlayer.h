@@ -9,7 +9,7 @@
 #include "CSF_CharacterFrameData.h"
 #include "CSCharacterPlayer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
 
 UENUM()
 enum class EAbilityIndex : uint8
@@ -48,12 +48,6 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	virtual void SetDead() override;
-
-	UFUNCTION()
-	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
-	
-	UFUNCTION()
-	void OnTriggerEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 // Camera Section
 protected:
@@ -150,7 +144,7 @@ protected:
 	TObjectPtr<class UCapsuleComponent> Trigger;
 
 	UPROPERTY()
-	TMap< FName, TObjectPtr<ACharacter> > CharsInPushing;
+	TObjectPtr<class UCSPushingCharacterComponent> PushingCharacterComponent;
 
 // WhiteHall
 public:
@@ -181,12 +175,18 @@ protected:
 
 // Interaction Section
 public:
-	FInteractionDelegate OnInteract;
+	UPROPERTY()
+	TObjectPtr<class UCSPlayerInteractionComponent> InteractionComponent;
+
+	//FInteractionDelegate OnInteract;
 
 	UFUNCTION(Server, Reliable)
 	void ServerInteract();
 
 	void Interact();
+	void EndInteract();
+
+	bool bIsInteracted;
 
 	float TimeSinceLastRecord = 0.0f; 
 

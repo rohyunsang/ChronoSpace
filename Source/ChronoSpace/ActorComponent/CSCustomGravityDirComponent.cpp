@@ -6,12 +6,14 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Actor/CSGravityCore.h"
+#include "Engine/World.h"
 #include "ChronoSpace.h"
+
+FVector UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 
 UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
 {
 	SetIsReplicatedByDefault(true);
-	OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 }
 
 
@@ -19,6 +21,7 @@ UCSCustomGravityDirComponent::UCSCustomGravityDirComponent()
 void UCSCustomGravityDirComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 
 	if ( GetOwner() )
 	{
@@ -30,7 +33,7 @@ void UCSCustomGravityDirComponent::BeginPlay()
 			OwnerCharacter->OnActorBeginOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorBeginOverlapCallback);
 			OwnerCharacter->OnActorEndOverlap.AddDynamic(this, &UCSCustomGravityDirComponent::OnActorEndOverlapCallback);
 		}
-
+		
 		if ( OwnerCharacter->HasAuthority() )
 		{
 			GetWorld()->GetTimerManager().SetTimer(GravityCheckTimerHandle, this, &UCSCustomGravityDirComponent::CheckGravity, 0.1f, true);

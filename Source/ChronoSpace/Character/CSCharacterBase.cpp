@@ -85,7 +85,7 @@ void ACSCharacterBase::AttachWindUpKeyToSocket()
 	}
 
 	// 3. 크기 조정 (스폰된 블루프린트의 루트 컴포넌트에 적용)
-	FVector DesiredScale(0.3f, 0.3f, 0.3f);
+	FVector DesiredScale(0.12f, 0.12f, 0.12f);
 	WindUpKeyActor->SetActorScale3D(DesiredScale);
 
 	// 4. 소켓 위치 가져오기
