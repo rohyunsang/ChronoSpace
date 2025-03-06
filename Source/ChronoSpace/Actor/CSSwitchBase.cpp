@@ -6,6 +6,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Physics/CSCollision.h"
+#include "ChronoSpace.h"
 
 // Sets default values
 ACSSwitchBase::ACSSwitchBase()
@@ -86,6 +87,7 @@ void ACSSwitchBase::EndInteraction()
 
 void ACSSwitchBase::Interact()
 {
+	UE_LOG(LogCS, Log, TEXT("[Netmode : %d] Interact"), GetWorld()->GetNetMode());
 	bIsInteracted = !bIsInteracted;
 
 	SetMaterial();
