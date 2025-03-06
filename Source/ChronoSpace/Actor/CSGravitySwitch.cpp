@@ -12,6 +12,7 @@
 
 ACSGravitySwitch::ACSGravitySwitch()
 {
+	bReplicates = true;
 }
 
 void ACSGravitySwitch::Interact()
