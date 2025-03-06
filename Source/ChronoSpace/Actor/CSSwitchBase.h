@@ -23,6 +23,9 @@ public:
 protected:
 	void SetMaterial();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastSetMaterial(bool bInIsInteracted);
+
 	UPROPERTY()
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 

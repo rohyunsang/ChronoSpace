@@ -16,6 +16,7 @@ ACSSwitchBase::ACSSwitchBase()
 
 	// Static Mesh Comp
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
+	StaticMeshComp->SetIsReplicated(true);
 	RootComponent = StaticMeshComp;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshRef(TEXT("/Script/Engine.StaticMesh'/Game/Mesh/Switch/functional_elements.functional_elements'"));
@@ -49,7 +50,16 @@ ACSSwitchBase::ACSSwitchBase()
 		MaterialSolidInteracted = MaterialSolidInteractedRef.Object;
 	}
 
-	SetMaterial();
+	if (bIsInteracted)
+	{
+		StaticMeshComp->SetMaterial(1, MaterialSolidInteracted);
+		StaticMeshComp->SetMaterial(3, MaterialGlowInteracted);
+	}
+	else
+	{
+		StaticMeshComp->SetMaterial(1, MaterialSolidNonInteracted);
+		StaticMeshComp->SetMaterial(3, MaterialGlowNonInteracted);
+	}
 
 	// Trigger
 	Trigger = CreateDefaultSubobject<USphereComponent>(TEXT("Trigger"));
@@ -95,7 +105,14 @@ void ACSSwitchBase::Interact()
 
 void ACSSwitchBase::SetMaterial()
 {
-	if ( bIsInteracted )
+	NetMulticastSetMaterial(bIsInteracted);
+}
+
+void ACSSwitchBase::NetMulticastSetMaterial_Implementation(bool bInIsInteracted)
+{
+	bIsInteracted = bInIsInteracted;
+	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] NetMulticastSetMaterial_Implementation, %d"), GetWorld()->GetNetMode(), bIsInteracted);
+	if (bIsInteracted)
 	{
 		StaticMeshComp->SetMaterial(1, MaterialSolidInteracted);
 		StaticMeshComp->SetMaterial(3, MaterialGlowInteracted);

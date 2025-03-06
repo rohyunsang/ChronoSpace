@@ -36,7 +36,7 @@ void ACSGravitySwitch::Interact()
 			UCSCustomGravityDirComponent::OrgGravityDirection = FVector(0.0f, 0.0f, -1.0f);
 		}
 
-		Char->GetCharacterMovement()->SetGravityDirection(CharGravity);
+		NetMulticastSetGravity(Char, CharGravity);
 	}
 
 	for (TActorIterator<ACSGravitySwitch> It(GetWorld()); It; ++It)
@@ -44,6 +44,11 @@ void ACSGravitySwitch::Interact()
 		ACSGravitySwitch* Switch = *It;
 		Switch->SetInteracted(bIsInteracted);
 	}
+}
+
+void ACSGravitySwitch::NetMulticastSetGravity_Implementation(ACharacter* Char, FVector Gravity)
+{
+	Char->GetCharacterMovement()->SetGravityDirection(Gravity);
 }
 
 void ACSGravitySwitch::SetInteracted(bool bInInteracted)

@@ -19,5 +19,8 @@ public:
 
 	virtual void Interact() override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticastSetGravity(ACharacter* Char, FVector Gravity);
+
 	void SetInteracted(bool bInInteracted);
 };
