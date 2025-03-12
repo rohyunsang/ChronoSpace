@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "UI/CSAbilityHUD.h"
 #include "CSStageGameInstanceSubsystem.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStageChanged);
@@ -21,7 +22,7 @@ public:
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class CHRONOSPACE_API UCSStageGameInstanceSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
@@ -53,4 +54,7 @@ public:
 
     // 스테이지 어빌리티 데이터 초기화
     void InitializeStageAbilities();
+
+    UPROPERTY(EditDefaultsOnly, Category = "UI")
+    TSubclassOf<UCSAbilityHUD> AbilityHUDClass;
 };

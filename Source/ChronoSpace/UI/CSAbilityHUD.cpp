@@ -6,21 +6,11 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystem/CSStageGameInstanceSubsystem.h"
 
 void UCSAbilityHUD::NativeConstruct()
 {
     Super::NativeConstruct();
-
-    //  스테이지 매니저 가져오기
-    UCSStageGameInstanceSubsystem* StageSubsystem = GetGameInstance()->GetSubsystem<UCSStageGameInstanceSubsystem>();
-    if (StageSubsystem)
-    {
-        //  스테이지가 변경될 때 UI를 업데이트하도록 이벤트 바인딩
-        if (!StageSubsystem->OnStageChanged.IsBound())
-        {
-            StageSubsystem->OnStageChanged.AddDynamic(this, &UCSAbilityHUD::InitializeAbilityUI);
-        }
-    }
 
     //  초기 UI 로드
     InitializeAbilityUI();
@@ -41,25 +31,8 @@ void UCSAbilityHUD::InitializeAbilityUI()
 
     for (int32 i = 0; i < AvailableAbilities.Num(); i++)
     {
-        //  어빌리티 UI 위젯 생성
-        UUserWidget* NewWidget = CreateWidget<UUserWidget>(this, AbilityWidgetClass);
-        if (NewWidget)
-        {
-            UImage* Icon = Cast<UImage>(NewWidget->GetWidgetFromName(TEXT("AbilityIcon")));
-            UTextBlock* Text = Cast<UTextBlock>(NewWidget->GetWidgetFromName(TEXT("AbilityText")));
+        UE_LOG(LogTemp, Warning, TEXT("AvailableAbilities: %s"), *AvailableAbilities[i]);
 
-            if (Icon)
-            {
-                //  아이콘을 설정할 수 있도록 (어빌리티 별 아이콘을 매핑해야 함)
-                // Icon->SetBrushFromTexture(SomeAbilityIcon);
-            }
-            if (Text)
-            {
-                Text->SetText(FText::FromString(AvailableAbilities[i]));
-            }
-
-            AbilityContainer->AddChild(NewWidget);
-        }
     }
 }
 

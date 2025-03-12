@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "CSStageGameInstanceSubsystem.h"
 #include "Components/VerticalBox.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
@@ -17,7 +16,9 @@
 UCLASS()
 class CHRONOSPACE_API UCSAbilityHUD : public UUserWidget
 {
-	public:
+    GENERATED_BODY()  // GENERATED_BODY() 추가 안 하면 UUserWidget 기능을 사용할 수 없음.
+
+public:
     // **어빌리티 UI 리스트를 표시할 컨테이너 (Blueprint에서 설정 필요)**
     UPROPERTY(meta = (BindWidget))
     UVerticalBox* AbilityContainer;

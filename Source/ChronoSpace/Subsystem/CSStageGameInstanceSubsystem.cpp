@@ -4,6 +4,18 @@
 UCSStageGameInstanceSubsystem::UCSStageGameInstanceSubsystem()
 {
     CurrentStage = "L_Main";  // 기본 스테이지 설정
+
+    //  AbilityHUDClass가 NULL이면 기본 블루프린트 클래스 설정
+    if (!AbilityHUDClass)
+    {
+        // /Script/UMGEditor.WidgetBlueprint'/Game/Blueprint/UI/BP_AbilityHUD.BP_AbilityHUD'
+        static ConstructorHelpers::FClassFinder<UCSAbilityHUD> HUD_BP(TEXT("/Game/Blueprint/UI/BP_AbilityHUD"));
+        if (HUD_BP.Succeeded())
+        {
+            AbilityHUDClass = HUD_BP.Class;
+            UE_LOG(LogTemp, Warning, TEXT("AbilityHUDClass initialized from Blueprint!"));
+        }
+    }
 }
 
 void UCSStageGameInstanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -31,6 +43,8 @@ void UCSStageGameInstanceSubsystem::ChangeStage(FString NewStage)
 
     // 레벨 변경 실행
     UGameplayStatics::OpenLevel(GetWorld(), *NewStage);
+
+
 }
 
 TArray<FString> UCSStageGameInstanceSubsystem::GetAvailableAbilities()
