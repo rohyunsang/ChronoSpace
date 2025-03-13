@@ -26,13 +26,29 @@ void UCSAbilityHUD::InitializeAbilityUI()
     AvailableAbilities = StageSubsystem->GetAvailableAbilities();
     SelectedAbilityIndex = 0;
 
-    //  기존 UI 제거
+    // 기존 UI 제거
     AbilityContainer->ClearChildren();
 
+    // 어빌리티 목록을 UI에 추가
     for (int32 i = 0; i < AvailableAbilities.Num(); i++)
     {
         UE_LOG(LogTemp, Warning, TEXT("AvailableAbilities: %s"), *AvailableAbilities[i]);
 
+        // 새로운 TextBlock 생성
+        UTextBlock* NewText = NewObject<UTextBlock>(this);
+        if (NewText)
+        {
+            // 텍스트 설정
+            NewText->SetText(FText::FromString(AvailableAbilities[i]));
+
+            // 텍스트 스타일 (폰트 크기 조정)
+            FSlateFontInfo FontInfo = NewText->Font;
+            FontInfo.Size = 24;  // 폰트 크기 설정
+            NewText->SetFont(FontInfo);
+
+            // AbilityContainer (VerticalBox)에 추가
+            AbilityContainer->AddChild(NewText);
+        }
     }
 }
 
