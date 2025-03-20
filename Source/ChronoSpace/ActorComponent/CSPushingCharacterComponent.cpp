@@ -11,6 +11,7 @@
 
 UCSPushingCharacterComponent::UCSPushingCharacterComponent()
 {
+	SetIsReplicatedByDefault(true);
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
@@ -45,14 +46,14 @@ void UCSPushingCharacterComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	FVector GravityDir = OwnerCharacter->GetCharacterMovement()->GetGravityDirection().GetSafeNormal();
 	FVector ForwardDir = OwnerCharacter->GetActorForwardVector();
 	FVector FlattenedForward = ForwardDir - (ForwardDir | GravityDir) * GravityDir;
-	float Strength = 10000.0f;
+	float Strength = 1000000.0f;
 	FVector Power = FlattenedForward * Strength;
 
 	for (auto Char = CharsInPushing.CreateIterator(); Char; ++Char)
 	{
 		if (IsValid(Char.Value()))
 		{
-			Char.Value()->GetCharacterMovement()->AddImpulse(Power);
+			Char.Value()->GetCharacterMovement()->AddForce(Power);
 		}
 	}
 }
