@@ -43,9 +43,7 @@ void UCSStageGameInstanceSubsystem::ChangeStage(FString NewStage)
 
     // 레벨 변경 실행
     UGameplayStatics::OpenLevel(GetWorld(), *NewStage);
-
-
-}
+} 
 
 TArray<FString> UCSStageGameInstanceSubsystem::GetAvailableAbilities()
 {

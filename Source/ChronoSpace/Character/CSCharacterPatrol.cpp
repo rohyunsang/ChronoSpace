@@ -41,7 +41,7 @@ ACSCharacterPatrol::ACSCharacterPatrol()
 	Trigger->SetRelativeLocation(FVector(700.0f, 0.0f, 130.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerEndOverlap);
-	Trigger->bVisualizeComponent = true;
+	// Trigger->bVisualizeComponent = true;
 
 	// ASC
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
