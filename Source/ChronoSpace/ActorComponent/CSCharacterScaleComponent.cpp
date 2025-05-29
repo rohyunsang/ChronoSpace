@@ -110,7 +110,7 @@ void UCSCharacterScaleComponent::ServerChangeScale_Implementation(ECharacterScal
 
 bool UCSCharacterScaleComponent::ServerChangeScale_Validate(ECharacterScaleType NewScaleType)
 {
-    // ? 올바른 범위: Small(0) ~ Large(2)
+    // 올바른 범위: Small(0) ~ Large(2)
     return NewScaleType >= ECharacterScaleType::Small && NewScaleType <= ECharacterScaleType::Large;
 }
 
