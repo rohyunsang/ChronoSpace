@@ -20,10 +20,14 @@ enum class EAbilityIndex : uint8
 	WhiteHole = 3,
 	WeakenGravity10P = 4,
 	WeakenGravity50P = 5,
+
 	ChronoControl = 100,
 	TimeRewind = 101,
 
-	AbilityPreviewBox = 200 
+	ScaleSmall = 200,
+	ScaleNormal = 201,
+	ScaleLarge = 202
+
 };
 
 /**
@@ -101,6 +105,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ScaleSmallAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ScaleNormalAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ScaleLargeAction;
+
 // ASC Section
 protected:
 	void SetupGASInputComponent();
@@ -135,15 +148,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap< int32, TSubclassOf<class UGameplayAbility> > StartInputAbilities;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSGASWidgetComponent> EnergyBar;
 
 // Trigger Section
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCapsuleComponent> Trigger;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSPushingCharacterComponent> PushingCharacterComponent;
 
 // WhiteHall
@@ -159,23 +172,23 @@ protected:
 
 
 // Character Frame Datas
-	// 3�ʰ� Transform ����
+
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Transform History")
 	TArray<FCSF_CharacterFrameData> TransformHistory;
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	float RecordInterval = 0.03f; // Transform ��� �ֱ� (0.03��)
+	float RecordInterval = 0.03f; 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	int32 MaxHistorySize = 99; // 3�� ������ Transform ��� (0.03�� ����)
+	int32 MaxHistorySize = 99; 
 
 	void RecordTransform();
 
 // Interaction Section
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSPlayerInteractionComponent> InteractionComponent;
 
 	//FInteractionDelegate OnInteract;
@@ -190,4 +203,10 @@ public:
 
 	float TimeSinceLastRecord = 0.0f; 
 
+
+// Character Scaling 
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<class UCSCharacterScaleComponent> ScaleComponent;
 };

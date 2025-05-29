@@ -23,6 +23,7 @@
 #include "ChronoSpace.h"
 #include "ActorComponent/CSPlayerInteractionComponent.h"
 #include "ActorComponent/CSPushingCharacterComponent.h"
+#include "ActorComponent/CSCharacterScaleComponent.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -123,6 +124,26 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 		InteractAction = InputActionInteractRef.Object;
 	}
 
+	// /Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleSmall.IA_ScaleSmall'
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleSmallRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleSmall.IA_ScaleSmall'"));
+	if (nullptr != InputActionScaleSmallRef.Object)
+	{
+		ScaleSmallAction = InputActionScaleSmallRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleNormalRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleNormal.IA_ScaleNormal'"));
+	if (nullptr != InputActionScaleNormalRef.Object)
+	{
+		ScaleNormalAction = InputActionScaleNormalRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleLargeRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleLarge.IA_ScaleLarge'"));
+	if (nullptr != InputActionScaleLargeRef.Object)
+	{
+		ScaleLargeAction = InputActionScaleLargeRef.Object;
+	}
+
+
 
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
@@ -162,6 +183,9 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 
 	InteractionComponent = CreateDefaultSubobject<UCSPlayerInteractionComponent>(TEXT("InteractionComponent"));
 	InteractionComponent->SetTrigger(Trigger);
+
+	// 캐릭터에 컴포넌트 추가
+	ScaleComponent = CreateDefaultSubobject<UCSCharacterScaleComponent>(TEXT("ScaleComponent"));
 }
 
 
@@ -363,11 +387,18 @@ void ACSCharacterPlayer::SetupGASInputComponent()
 		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ChronoControl);
 		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ChronoControl);
 
-		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::AbilityPreviewBox);
-		EnhancedInputComponent->BindAction(AbilityPreviewAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::AbilityPreviewBox);
 
 		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimeRewind);
 		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimeRewind);
+
+		EnhancedInputComponent->BindAction(ScaleSmallAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleSmall);
+		EnhancedInputComponent->BindAction(ScaleSmallAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleSmall);
+
+		EnhancedInputComponent->BindAction(ScaleNormalAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleNormal);
+		EnhancedInputComponent->BindAction(ScaleNormalAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleNormal);
+
+		EnhancedInputComponent->BindAction(ScaleLargeAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleLarge);
+		EnhancedInputComponent->BindAction(ScaleLargeAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleLarge);
 
 		if (ASC)
 		{
