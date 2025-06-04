@@ -27,30 +27,25 @@ public:
 
 	UCSAttributeSet();
 
-	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Energy);
-	ATTRIBUTE_ACCESSORS(UCSAttributeSet, MaxEnergy);
-	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Damage);
-
-	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
-	//virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
-	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
-	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
-
-protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Energy", ReplicatedUsing = OnRep_Energy, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData Energy;
+	// HP Attribute
+	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_Health)
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UCSAttributeSet, Health)
 
-	UPROPERTY(BlueprintReadOnly, Category = "Energy", ReplicatedUsing = OnRep_MaxEnergy, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MaxEnergy;
+	// Max HP Attribute
+	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_MaxHealth)
+	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UCSAttributeSet, MaxHealth)
 
-	UPROPERTY(BlueprintReadOnly, Category = "Energy", Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData Damage;
+	// Replication functions
+	UFUNCTION()
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
 
 	UFUNCTION()
-	void OnRep_Energy(const FGameplayAttributeData& OldEnergy);
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
 
-	UFUNCTION()
-	void OnRep_MaxEnergy(const FGameplayAttributeData& OldMaxEnergy);
+protected:
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 };

@@ -24,6 +24,7 @@
 #include "ActorComponent/CSPlayerInteractionComponent.h"
 #include "ActorComponent/CSPushingCharacterComponent.h"
 #include "ActorComponent/CSCharacterScaleComponent.h"
+#include "Player/CSPlayerController.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -144,7 +145,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	}
 
 
-
+	/*
 	// UI 
 	EnergyBar = CreateDefaultSubobject<UCSGASWidgetComponent>(TEXT("Widget"));
 	EnergyBar->SetupAttachment(GetMesh());
@@ -167,6 +168,7 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 			UE_LOG(LogTemp, Error, TEXT("EnergyBar is not valid!"));
 		}
 	}
+	*/
 
 	// ASC
 	ASC = nullptr;
@@ -261,7 +263,7 @@ void ACSCharacterPlayer::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	SetASC();
-	EnergyBar->ActivateGAS();
+	// EnergyBar->ActivateGAS();
 }
 
 void ACSCharacterPlayer::BeginPlay()
@@ -271,7 +273,7 @@ void ACSCharacterPlayer::BeginPlay()
 
 	if ( HasAuthority() )
 	{
-		EnergyBar->ActivateGAS();
+		// EnergyBar->ActivateGAS();
 	}
 	
 	if (!IsLocallyControlled())
@@ -510,3 +512,10 @@ void ACSCharacterPlayer::ClearWhiteHall()
 }
 
 
+void ACSCharacterPlayer::RequestUIRefresh()
+{
+	if (ACSPlayerController* PC = Cast<ACSPlayerController>(GetController()))
+	{
+		PC->RefreshGameUI();
+	}
+}

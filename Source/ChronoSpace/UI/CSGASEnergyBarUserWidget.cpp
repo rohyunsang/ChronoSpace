@@ -13,6 +13,7 @@
 
 void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 {
+	/*
 	Super::SetAbilitySystemComponent(InOwner);
 	
 	if (ASC)
@@ -46,6 +47,7 @@ void UCSGASEnergyBarUserWidget::SetAbilitySystemComponent(AActor* InOwner)
 	{
 		UE_LOG(LogCS, Warning, TEXT("ASC is null! Ensure that the Ability System Component is properly initialized before calling this function."));
 	}
+	*/
 }
 
 void UCSGASEnergyBarUserWidget::OnEnergyChanged(const FOnAttributeChangeData& ChangeData)

@@ -148,9 +148,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap< int32, TSubclassOf<class UGameplayAbility> > StartInputAbilities;
 
+	/*
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSGASWidgetComponent> EnergyBar;
 
+	*/
+	
 // Trigger Section
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -209,4 +212,10 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSCharacterScaleComponent> ScaleComponent;
+
+
+// HP UI
+public:
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	void RequestUIRefresh();
 };

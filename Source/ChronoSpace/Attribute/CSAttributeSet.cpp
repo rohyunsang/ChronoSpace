@@ -5,77 +5,40 @@
 #include "ChronoSpace.h"
 #include "GameplayEffectExtension.h"
 #include "Player/CSPlayerController.h"
-//#include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
 
-UCSAttributeSet::UCSAttributeSet() : MaxEnergy(100.0f), Damage(0.0f)
+UCSAttributeSet::UCSAttributeSet()
 {
-	InitEnergy(GetMaxEnergy());
+	// 기본값 설정
+	InitHealth(100.0f);
+	InitMaxHealth(100.0f);
 }
 
-void UCSAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+void UCSAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (Attribute == GetDamageAttribute())
-	{
-		NewValue = NewValue < 0.0f ? 0.0f : NewValue;
-	}
-	
-	// -> 최소 데미지 0.0f 으로 설정. 
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UCSAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UCSAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 }
 
-bool UCSAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
+void UCSAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
-	return true;
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCSAttributeSet, Health, OldHealth);
+}
+
+void UCSAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UCSAttributeSet, MaxHealth, OldMaxHealth);
 }
 
 void UCSAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	float MinimumEnergy = 0.0f;
-
-	if (Data.EvaluatedData.Attribute == GetEnergyAttribute())
+	// HP 클램핑
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Direct Health Access : %f"), GetEnergy());
-		SetEnergy(FMath::Clamp(GetEnergy(), MinimumEnergy, GetMaxEnergy()));
-	}
-
-	if ( Data.EvaluatedData.Attribute == GetDamageAttribute() )
-	{
-		SetEnergy(FMath::Clamp(GetEnergy() - GetDamage(), MinimumEnergy, GetMaxEnergy()));
-		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d] Damage Detected : %f | Now Energy : %f"), GetWorld()->GetNetMode(), GetDamage(), GetEnergy());
-
-		AActor* TargetActor = Data.Target.GetAvatarActor();
-		if (TargetActor == nullptr) return;
-
-		if (APawn* Pawn = Cast<APawn>(TargetActor))
-		{
-			ACSPlayerController* PC = Cast<ACSPlayerController>(Pawn->GetController());
-
-			if (PC)
-			{
-				PC->ShakeCamera();
-			}
-		}
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	}
 }
-
-void UCSAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
-	DOREPLIFETIME_CONDITION_NOTIFY(UCSAttributeSet, Energy, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UCSAttributeSet, MaxEnergy, COND_None, REPNOTIFY_Always);
-}
-
-void UCSAttributeSet::OnRep_Energy(const FGameplayAttributeData& OldEnergy)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCSAttributeSet, Energy, OldEnergy);
-}
-
-void UCSAttributeSet::OnRep_MaxEnergy(const FGameplayAttributeData& OldMaxEnergy)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UCSAttributeSet, MaxEnergy, OldMaxEnergy);
-}
-
-
