@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "Character/CSCharacterPlayer.h"
+#include "ActorComponent/CSGASManagerComponent.h"
 #include "CSGA_AbilityPreviewBox.generated.h"
 
 /**

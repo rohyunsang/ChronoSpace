@@ -11,25 +11,6 @@
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionDelegate);
 
-UENUM()
-enum class EAbilityIndex : uint8
-{
-
-	ReverseGravity = 1,
-	BlackHole = 2,
-	WhiteHole = 3,
-	WeakenGravity10P = 4,
-	WeakenGravity50P = 5,
-
-	ChronoControl = 100,
-	TimeRewind = 101,
-
-	ScaleSmall = 200,
-	ScaleNormal = 201,
-	ScaleLarge = 202
-
-};
-
 /**
  * 
  */
@@ -44,9 +25,12 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
 
 	virtual void OnRep_PlayerState() override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS") 
+	TObjectPtr<class UCSGASManagerComponent> GASManagerComponent;
 
 protected:
 	virtual void Tick(float DeltaSeconds) override;
@@ -79,74 +63,15 @@ protected:
 	TObjectPtr<class UInputAction> ShoulderLookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ReverseGravityAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-
-	TObjectPtr<class UInputAction> BlackHoleAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> WhiteHoleAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> WeakenGravity10PAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> WeakenGravity50PAction;
-
-	TObjectPtr<class UInputAction> ChronoControlAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AbilityPreviewAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> TimeRewindAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> InteractAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ScaleSmallAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ScaleNormalAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> ScaleLargeAction;
-
 // ASC Section
 protected:
-	void SetupGASInputComponent();
-
-	// Input Pressed RPC **************************************
-	void GASInputPressed(int32 InputId);
-
-	UFUNCTION(Server, Reliable)
-	void ServerGASInputPressed(int32 InputId);
-
-	void HandleGASInputPressed(int32 InputId);
-	// ********************************************************
-
-	// Input Released RPC *************************************
-	void GASInputReleased(int32 InputId);
-
-	UFUNCTION(Server, Reliable)
-	void ServerGASInputReleased(int32 InputId);
-
-	void HandleGASInputReleased(int32 InputId);
-	// ********************************************************
-
-	void SetASC();
-	void SetGASAbilities();
-
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
-
-	UPROPERTY(EditAnywhere, Category = GAS)
-	TArray< TSubclassOf<class UGameplayAbility> > StartAbilities;
-
-	UPROPERTY(EditAnywhere, Category = GAS)
-	TMap< int32, TSubclassOf<class UGameplayAbility> > StartInputAbilities;
 
 	/*
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
