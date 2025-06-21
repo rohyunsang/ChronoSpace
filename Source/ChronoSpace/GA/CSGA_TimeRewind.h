@@ -26,9 +26,9 @@ public:
 		const FGameplayEventData* TriggerEventData) override;
 
 protected:
+	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
 	/** Ability Task가 완료되었을 때 호출할 델리게이트 함수 */
 	UFUNCTION()
 	void OnTimeRewindFinishedDelegate();
-
-
-};
+}; 

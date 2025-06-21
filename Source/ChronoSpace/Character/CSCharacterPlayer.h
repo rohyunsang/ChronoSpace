@@ -32,8 +32,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GAS") 
 	TObjectPtr<class UCSGASManagerComponent> GASManagerComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "TransformRecord")
+	TObjectPtr<class UCSTransformRecordComponent> TransformRecordComponent;
+
 protected:
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	virtual void SetDead() override;
 
@@ -98,22 +100,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class ACSWhiteHall> WhiteHall;
 
-
-// Character Frame Datas
-
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Transform History")
-	TArray<FCSF_CharacterFrameData> TransformHistory;
-protected:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	float RecordInterval = 0.03f; 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Transform History")
-	int32 MaxHistorySize = 99; 
-
-	void RecordTransform();
-
 // Interaction Section
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -128,9 +114,6 @@ public:
 	void EndInteract();
 
 	bool bIsInteracted;
-
-	float TimeSinceLastRecord = 0.0f; 
-
 
 // Character Scaling 
 

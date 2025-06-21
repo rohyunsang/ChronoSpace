@@ -25,6 +25,7 @@
 #include "ActorComponent/CSPushingCharacterComponent.h"
 #include "ActorComponent/CSCharacterScaleComponent.h"
 #include "ActorComponent/CSGASManagerComponent.h"
+#include "ActorComponent/CSTransformRecordComponent.h"
 #include "Player/CSPlayerController.h"
 
 
@@ -33,9 +34,6 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	bReplicates = true;
 
 	bIsInteracted = false;
-
-	PrimaryActorTick.bCanEverTick = true;
-
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -93,18 +91,8 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	ScaleComponent = CreateDefaultSubobject<UCSCharacterScaleComponent>(TEXT("ScaleComponent"));
 	
 	GASManagerComponent = CreateDefaultSubobject<UCSGASManagerComponent>(TEXT("GASManagerComponent"));
-}
 
-
-void ACSCharacterPlayer::RecordTransform()
-{
-	FCSF_CharacterFrameData FrameData(GetActorLocation(), GetActorRotation(), GetWorld()->GetTimeSeconds());
-
-	if (TransformHistory.Num() >= MaxHistorySize + 1) // 1 is offset
-	{
-		TransformHistory.RemoveAt(0); 
-	}
-	TransformHistory.Add(FrameData);
+	TransformRecordComponent = CreateDefaultSubobject<UCSTransformRecordComponent>(TEXT("TransformRecordComponent"));
 }
 
 void ACSCharacterPlayer::ServerInteract_Implementation()
@@ -197,18 +185,6 @@ void ACSCharacterPlayer::BeginPlay()
 
 	AttachWindUpKeyToSocket();
 }
-
-void ACSCharacterPlayer::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	TimeSinceLastRecord += DeltaSeconds;
-	if (TimeSinceLastRecord >= RecordInterval)
-	{
-		RecordTransform();
-		TimeSinceLastRecord = 0.0f;
-	} 
-} 
 
 void ACSCharacterPlayer::SetDead()
 {
