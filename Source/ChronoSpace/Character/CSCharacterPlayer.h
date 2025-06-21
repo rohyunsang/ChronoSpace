@@ -37,7 +37,15 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PreInitializeComponents() override; 
 	virtual void SetDead() override;
+
+// Data
+protected:
+	void SetData();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr< class UCSCharacterPlayerData > Data;
 
 // Camera Section
 protected:

@@ -27,6 +27,7 @@
 #include "ActorComponent/CSGASManagerComponent.h"
 #include "ActorComponent/CSTransformRecordComponent.h"
 #include "Player/CSPlayerController.h"
+#include "DataAsset/CSCharacterPlayerData.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
@@ -36,13 +37,11 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
-
 
 	/*
 	// UI 
@@ -74,13 +73,10 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 
 	// Trigger
 	Trigger = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger"));
-	Trigger->InitCapsuleSize(50.f, 100.0f);
 	Trigger->SetCollisionProfileName( CPROFILE_OVERLAPALL );
 	Trigger->SetupAttachment(GetCapsuleComponent());
-	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
 	// 캐릭터에 컴포넌트 추가
-
 	PushingCharacterComponent = CreateDefaultSubobject<UCSPushingCharacterComponent>(TEXT("PushingCharacterComponent"));
 	PushingCharacterComponent->SetTrigger(Trigger);
 
@@ -157,6 +153,13 @@ void ACSCharacterPlayer::BeginPlay()
 	AttachWindUpKeyToSocket();
 }
 
+void ACSCharacterPlayer::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	SetData();
+}
+
 void ACSCharacterPlayer::SetDead()
 {
 	Super::SetDead();
@@ -166,6 +169,30 @@ void ACSCharacterPlayer::SetDead()
 	{
 		DisableInput(PlayerController); 
 	}
+}
+
+void ACSCharacterPlayer::SetData()
+{
+	if (Data == nullptr) return;
+
+	CameraBoom->TargetArmLength = Data->TargetArmLength;
+	CameraBoom->SetRelativeLocation(Data->CameraOffset);
+
+	GetCharacterMovement()->RotationRate = Data->RotationRate;
+	GetCharacterMovement()->JumpZVelocity = Data->JumpZVelocity;
+	GetCharacterMovement()->AirControl = Data->AirControl;
+	GetCharacterMovement()->MaxWalkSpeed = Data->MaxWalkSpeed;
+	GetCharacterMovement()->MinAnalogWalkSpeed = Data->MinAnalogWalkSpeed;
+	GetCharacterMovement()->BrakingDecelerationWalking = Data->BrakingDecelerationWalking;
+
+	GetCapsuleComponent()->SetCapsuleSize(Data->CapsuleRadius, Data->CapsuleHeight); 
+
+	GetMesh()->SetSkeletalMesh(Data->Mesh);
+	GetMesh()->SetAnimInstanceClass(Data->AnimInstance);
+	GetMesh()->SetRelativeLocation(Data->MeshLocation);
+	GetMesh()->SetRelativeRotation(Data->MeshRotation); 
+
+	Trigger->SetCapsuleSize(Data->TriggerRadius, Data->TriggerHeight); 
 }
 
 void ACSCharacterPlayer::ShoulderMove(const FInputActionValue& Value)

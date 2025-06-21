@@ -13,18 +13,11 @@
 #include "AbilitySystemComponent.h"
 #include "Attribute/CSAttributeSet.h"
 #include "Components/StaticMeshComponent.h"
+#include "DataAsset/CSCharacterPatrolData.h"
 #include "GA/CSGA_GiveDamage.h"
 
 ACSCharacterPatrol::ACSCharacterPatrol()
 {
-	GetMesh()->SetRelativeScale3D(FVector(0.5f, 0.5f, 0.5f));
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/SK_Chibi_Skullboy.SK_Chibi_Skullboy'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
-
 	AIControllerClass = ACSAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCharacterMovement()->GetNavMovementProperties()->bUseAccelerationForPaths = true;
@@ -35,13 +28,10 @@ ACSCharacterPatrol::ACSCharacterPatrol()
 
 	// Trigger
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
-	Trigger->SetBoxExtent(FVector(800.0f, 700.0f, 130.0f));
 	Trigger->SetCollisionProfileName(CPROFILE_CSTRIGGER);
 	Trigger->SetupAttachment(GetCapsuleComponent());
-	Trigger->SetRelativeLocation(FVector(700.0f, 0.0f, 130.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerBeginOverlap);
 	Trigger->OnComponentEndOverlap.AddDynamic(this, &ACSCharacterPatrol::OnTriggerEndOverlap);
-	// Trigger->bVisualizeComponent = true;
 
 	// ASC
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
@@ -51,6 +41,11 @@ ACSCharacterPatrol::ACSCharacterPatrol()
 
 FVector ACSCharacterPatrol::GetPatrolPos()
 {
+	if (PatrolPosesLength == 0)
+	{
+		return GetActorLocation();
+	}
+
 	int8 PrevIdx = CurrentPatrolIdx;
 	CurrentPatrolIdx = (CurrentPatrolIdx + 1) % PatrolPosesLength;
 	//UE_LOG(LogCS, Log, TEXT("%d"), CurrentPatrolIdx);
@@ -81,9 +76,38 @@ void ACSCharacterPatrol::BeginPlay()
 	}
 }
 
+void ACSCharacterPatrol::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	SetData();
+}
+
 ACSCharacterPlayer* ACSCharacterPatrol::GetCharacterPlayer()
 {
 	return CharacterPlayer;
+}
+
+void ACSCharacterPatrol::SetData()
+{
+	if (Data == nullptr) return;
+
+	GetCharacterMovement()->RotationRate = Data->RotationRate;
+	GetCharacterMovement()->JumpZVelocity = Data->JumpZVelocity;
+	GetCharacterMovement()->AirControl = Data->AirControl;
+	GetCharacterMovement()->MaxWalkSpeed = Data->MaxWalkSpeed;
+	GetCharacterMovement()->MinAnalogWalkSpeed = Data->MinAnalogWalkSpeed;
+	GetCharacterMovement()->BrakingDecelerationWalking = Data->BrakingDecelerationWalking;
+
+	GetCapsuleComponent()->SetCapsuleSize(Data->CapsuleRadius, Data->CapsuleHeight);
+
+	GetMesh()->SetSkeletalMesh(Data->Mesh);
+	GetMesh()->SetAnimInstanceClass(Data->AnimInstance);
+	GetMesh()->SetRelativeLocation(Data->MeshLocation);
+	GetMesh()->SetRelativeRotation(Data->MeshRotation);
+
+	Trigger->SetBoxExtent(Data->TriggerExtent);
+	Trigger->SetRelativeLocationAndRotation(Data->TriggerLocation, Data->TriggerRotation);
 }
 
 void ACSCharacterPatrol::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)

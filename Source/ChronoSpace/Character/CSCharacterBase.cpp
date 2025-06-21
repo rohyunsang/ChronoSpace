@@ -37,17 +37,17 @@ ACSCharacterBase::ACSCharacterBase()
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'"));
-	if (CharacterMeshRef.Object)
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
-	}
-	// /Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
-	if (AnimInstanceClassRef.Class)
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
-	}
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'"));
+	//if (CharacterMeshRef.Object)
+	//{
+	//	GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
+	//}
+	//// /Script/Engine.SkeletalMesh'/Game/Chibi_characters/Meshes/MainCharacter.MainCharacter'
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
+	//if (AnimInstanceClassRef.Class)
+	//{
+	//	GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
+	//}
 
 	// Gravity Core
 	CustomGravityDirComponent = CreateDefaultSubobject<UCSCustomGravityDirComponent>(TEXT("CustomGravityDirComponent"));

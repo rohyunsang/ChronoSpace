@@ -19,13 +19,20 @@ public:
 	ACSCharacterPatrol();
 	
 	FVector GetPatrolPos();
-
-	virtual void BeginPlay() override;
-
 	virtual class ACSCharacterPlayer* GetCharacterPlayer() override;
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void PreInitializeComponents() override;
 
+// Data Section
+protected:
+	void SetData();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<class UCSCharacterPatrolData> Data;
+
+protected:
 	UPROPERTY()
 	TObjectPtr<class ACSCharacterPlayer> Player;
 
