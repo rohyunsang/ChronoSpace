@@ -24,17 +24,14 @@
 #include "ActorComponent/CSPlayerInteractionComponent.h"
 #include "ActorComponent/CSPushingCharacterComponent.h"
 #include "ActorComponent/CSCharacterScaleComponent.h"
+#include "ActorComponent/CSGASManagerComponent.h"
+#include "ActorComponent/CSTransformRecordComponent.h"
 #include "Player/CSPlayerController.h"
 
 
 ACSCharacterPlayer::ACSCharacterPlayer()
 {
 	bReplicates = true;
-
-	bIsInteracted = false;
-
-	PrimaryActorTick.bCanEverTick = true;
-
 
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -45,104 +42,6 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
-
-	// Input
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> InputMappingContextRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
-	if (nullptr != InputMappingContextRef.Object)
-	{
-		MappingContext = InputMappingContextRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionJumpRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Jump.IA_Jump'"));
-	if (nullptr != InputActionJumpRef.Object)
-	{
-		JumpAction = InputActionJumpRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderMoveRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
-	if (nullptr != InputActionShoulderMoveRef.Object)
-	{
-		ShoulderMoveAction = InputActionShoulderMoveRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionShoulderLookRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
-	if (nullptr != InputActionShoulderLookRef.Object)
-	{
-		ShoulderLookAction = InputActionShoulderLookRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionReverseGravityRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ReverseGravity.IA_ReverseGravity'"));
-	if (nullptr != InputActionReverseGravityRef.Object)
-	{
-		ReverseGravityAction = InputActionReverseGravityRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionBlackHoleRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_BlackHole.IA_BlackHole'"));
-	if (nullptr != InputActionBlackHoleRef.Object)
-	{
-		BlackHoleAction = InputActionBlackHoleRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWhiteHoleRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WhiteHole.IA_WhiteHole'"));
-	if (nullptr != InputActionWhiteHoleRef.Object)
-	{
-		WhiteHoleAction = InputActionWhiteHoleRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWeakenGravity10PActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WeakenGravity10P.IA_WeakenGravity10P'"));
-	if (nullptr != InputActionBlackHoleRef.Object)
-	{
-		WeakenGravity10PAction = InputActionWeakenGravity10PActionRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionWeakenGravity50PActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_WeakenGravity50P.IA_WeakenGravity50P'"));
-	if (nullptr != InputActionWhiteHoleRef.Object)
-	{
-		WeakenGravity50PAction = InputActionWeakenGravity50PActionRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionChronoControlRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ChronoControl.IA_ChronoControl'"));
-	if (nullptr != InputActionChronoControlRef.Object)
-	{
-		ChronoControlAction = InputActionChronoControlRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionAbilityPreviewRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_AbilityPreview.IA_AbilityPreview'"));
-	if (nullptr != InputActionAbilityPreviewRef.Object)
-	{
-		AbilityPreviewAction = InputActionAbilityPreviewRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionTimeRewindRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_TimeRewind.IA_TimeRewind'"));
-	if (nullptr != InputActionTimeRewindRef.Object)
-	{
-		TimeRewindAction = InputActionTimeRewindRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionInteractRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Interact.IA_Interact'"));
-	if (nullptr != InputActionInteractRef.Object)
-	{
-		InteractAction = InputActionInteractRef.Object;
-	}
-
-	// /Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleSmall.IA_ScaleSmall'
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleSmallRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleSmall.IA_ScaleSmall'"));
-	if (nullptr != InputActionScaleSmallRef.Object)
-	{
-		ScaleSmallAction = InputActionScaleSmallRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleNormalRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleNormal.IA_ScaleNormal'"));
-	if (nullptr != InputActionScaleNormalRef.Object)
-	{
-		ScaleNormalAction = InputActionScaleNormalRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction> InputActionScaleLargeRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_ScaleLarge.IA_ScaleLarge'"));
-	if (nullptr != InputActionScaleLargeRef.Object)
-	{
-		ScaleLargeAction = InputActionScaleLargeRef.Object;
-	}
 
 
 	/*
@@ -180,53 +79,20 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetupAttachment(GetCapsuleComponent());
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
+	// 캐릭터에 컴포넌트 추가
+
 	PushingCharacterComponent = CreateDefaultSubobject<UCSPushingCharacterComponent>(TEXT("PushingCharacterComponent"));
 	PushingCharacterComponent->SetTrigger(Trigger);
 
 	InteractionComponent = CreateDefaultSubobject<UCSPlayerInteractionComponent>(TEXT("InteractionComponent"));
 	InteractionComponent->SetTrigger(Trigger);
 
-	// 캐릭터에 컴포넌트 추가
 	ScaleComponent = CreateDefaultSubobject<UCSCharacterScaleComponent>(TEXT("ScaleComponent"));
+	
+	GASManagerComponent = CreateDefaultSubobject<UCSGASManagerComponent>(TEXT("GASManagerComponent"));
+
+	TransformRecordComponent = CreateDefaultSubobject<UCSTransformRecordComponent>(TEXT("TransformRecordComponent"));
 }
-
-
-void ACSCharacterPlayer::RecordTransform()
-{
-	FCSF_CharacterFrameData FrameData(GetActorLocation(), GetActorRotation(), GetWorld()->GetTimeSeconds());
-
-	if (TransformHistory.Num() >= MaxHistorySize + 1) // 1 is offset
-	{
-		TransformHistory.RemoveAt(0); 
-	}
-	TransformHistory.Add(FrameData);
-}
-
-void ACSCharacterPlayer::ServerInteract_Implementation()
-{
-	InteractionComponent->ExecInteraction();
-}
-
-void ACSCharacterPlayer::Interact()
-{
-	if (bIsInteracted) return;
-
-	if ( HasAuthority() )
-	{
-		InteractionComponent->ExecInteraction();
-	}
-	else
-	{
-		ServerInteract();
-	}
-	bIsInteracted = true;
-}
-
-void ACSCharacterPlayer::EndInteract()
-{
-	bIsInteracted = false;
-}
-
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 {
@@ -236,9 +102,11 @@ UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 void ACSCharacterPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] PossessedBy"), GetWorld()->GetNetMode());
-	SetASC();
-	SetGASAbilities();
+
+	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
+	
+	GASManagerComponent->SetASC(CSPS->GetAbilitySystemComponent(), CSPS);
+	GASManagerComponent->SetGASAbilities();
 }
 
 void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -252,17 +120,16 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
 
-	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::Interact);
-	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::EndInteract);
-
-	SetupGASInputComponent();
+	GASManagerComponent->SetupGASInputComponent(Cast<UEnhancedInputComponent>(PlayerInputComponent));
+	InteractionComponent->SetInteractionInputComponent(Cast<UEnhancedInputComponent>(PlayerInputComponent));
 }
 
 void ACSCharacterPlayer::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	SetASC();
+	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
+	GASManagerComponent->SetASC(ASC, CSPS);
 	// EnergyBar->ActivateGAS();
 }
 
@@ -290,18 +157,6 @@ void ACSCharacterPlayer::BeginPlay()
 	AttachWindUpKeyToSocket();
 }
 
-void ACSCharacterPlayer::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	TimeSinceLastRecord += DeltaSeconds;
-	if (TimeSinceLastRecord >= RecordInterval)
-	{
-		RecordTransform();
-		TimeSinceLastRecord = 0.0f;
-	} 
-} 
-
 void ACSCharacterPlayer::SetDead()
 {
 	Super::SetDead();
@@ -310,43 +165,6 @@ void ACSCharacterPlayer::SetDead()
 	if (PlayerController) 
 	{
 		DisableInput(PlayerController); 
-	}
-}
-
-void ACSCharacterPlayer::SetASC()
-{
-	if (ASC) return;
-
-	ACSPlayerState* CSPS = GetPlayerState<ACSPlayerState>();
-	if (CSPS)
-	{
-		ASC = CSPS->GetAbilitySystemComponent();
-		ASC->InitAbilityActorInfo(CSPS, this);
-		ASC->ReplicationMode = EGameplayEffectReplicationMode::Mixed;
-		//UE_LOG(LogCS, Log, TEXT("*** [NetMode : %d] SetASC, %s, %s"), GetWorld()->GetNetMode(), *GetName(), *GetPlayerState()->GetName());
-	}
-	else
-	{
-		UE_LOG(LogCS, Log, TEXT("[NetMode %d] SetASC - ASC Not Found"), GetWorld()->GetNetMode());
-	}
-}
-
-void ACSCharacterPlayer::SetGASAbilities()
-{
-	if ( ASC )
-	{
-		for (const auto& StartAbility : StartAbilities)
-		{
-			FGameplayAbilitySpec StartSpec(StartAbility);
-			ASC->GiveAbility(StartSpec);
-		}
-
-		for (const auto& StartInputAbility : StartInputAbilities)
-		{
-			FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
-			StartSpec.InputID = StartInputAbility.Key;
-			ASC->GiveAbility(StartSpec);
-		}
 	}
 }
 
@@ -364,142 +182,6 @@ void ACSCharacterPlayer::ShoulderLook(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
-}
-
-void ACSCharacterPlayer::SetupGASInputComponent()
-{
-	//UE_LOG(LogCS, Log, TEXT("[NetMode: %d] SetupGASInputComponent Start"), GetWorld()->GetNetMode());
-	if (IsValid(InputComponent))
-	{
-		UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ReverseGravity);
-		EnhancedInputComponent->BindAction(ReverseGravityAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ReverseGravity);
-
-		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::BlackHole);
-		EnhancedInputComponent->BindAction(BlackHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::BlackHole);
-		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WhiteHole);
-		EnhancedInputComponent->BindAction(WhiteHoleAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WhiteHole);
-		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity10P);
-		EnhancedInputComponent->BindAction(WeakenGravity10PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity10P);
-		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::WeakenGravity50P);
-		EnhancedInputComponent->BindAction(WeakenGravity50PAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::WeakenGravity50P);
-		//UE_LOG(LogCS, Log, TEXT("SetupGASInputComponent Succeed"));
-
-		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ChronoControl);
-		EnhancedInputComponent->BindAction(ChronoControlAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ChronoControl);
-
-
-		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::TimeRewind);
-		EnhancedInputComponent->BindAction(TimeRewindAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::TimeRewind);
-
-		EnhancedInputComponent->BindAction(ScaleSmallAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleSmall);
-		EnhancedInputComponent->BindAction(ScaleSmallAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleSmall);
-
-		EnhancedInputComponent->BindAction(ScaleNormalAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleNormal);
-		EnhancedInputComponent->BindAction(ScaleNormalAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleNormal);
-
-		EnhancedInputComponent->BindAction(ScaleLargeAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::GASInputPressed, (int32)EAbilityIndex::ScaleLarge);
-		EnhancedInputComponent->BindAction(ScaleLargeAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::GASInputReleased, (int32)EAbilityIndex::ScaleLarge);
-
-		if (ASC)
-		{
-			ASC->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag(FName("Ability.Movement")));
-		}
-
-		UE_LOG(LogTemp, Log, TEXT("SetupGASInputComponent Succeed"));
-	}
-	else if (!IsValid(ASC))
-	{
-		UE_LOG(LogTemp, Log, TEXT("Invalid ASC"));
-	}
-	else
-	{
-		UE_LOG(LogCS, Log, TEXT("Invalid InputComponent"));
-	}
-}
-
-void ACSCharacterPlayer::GASInputPressed(int32 InputId)
-{
-	
-	if ( HasAuthority() )
-	{
-		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], GASInputPressed"), GetWorld()->GetNetMode());
-		HandleGASInputPressed(InputId);
-	}
-	else
-	{
-		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], GASInputPressed"), GetWorld()->GetNetMode());
-		ServerGASInputPressed(InputId);
-	}
-}
-
-void ACSCharacterPlayer::ServerGASInputPressed_Implementation(int32 InputId)
-{
-	//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], ServerGASInputPressed_Implementation"), GetWorld()->GetNetMode());
-	if ( HasAuthority() )
-	{
-		HandleGASInputPressed(InputId);
-	}
-}
-
-void ACSCharacterPlayer::HandleGASInputPressed(int32 InputId)
-{
-	if ( !ASC )
-	{
-		return;
-	}
-
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		if (Spec->InputPressed) return;
-		//UE_LOG(LogCS, Log, TEXT("[NetMode : %d], HandleGASInputPressed"), GetWorld()->GetNetMode());
-		Spec->InputPressed = true;
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputPressed(*Spec);
-		}
-		else
-		{
-			ASC->TryActivateAbility(Spec->Handle);
-		}
-	}
-}
-
-void ACSCharacterPlayer::GASInputReleased(int32 InputId)
-{
-	if (HasAuthority())
-	{
-		HandleGASInputReleased(InputId);
-	}
-	else
-	{
-		ServerGASInputReleased(InputId);
-	}
-}
-
-void ACSCharacterPlayer::HandleGASInputReleased(int32 InputId)
-{
-	if ( !ASC )
-	{
-		return;
-	}
-
-	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
-	if (Spec)
-	{
-		Spec->InputPressed = false;
-		if (Spec->IsActive())
-		{
-			ASC->AbilitySpecInputReleased(*Spec);
-		}
-	}
-}
-
-void ACSCharacterPlayer::ServerGASInputReleased_Implementation(int32 InputId)
-{
-	HandleGASInputReleased(InputId);
 }
 
 void ACSCharacterPlayer::ClearWhiteHall()

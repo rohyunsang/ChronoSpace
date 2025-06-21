@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"  // 중력 조절을 위해 필요 
+#include "ActorComponent/CSTransformRecordComponent.h"
 
 UCSGA_TimeRewind::UCSGA_TimeRewind()
 {
@@ -44,13 +45,16 @@ void UCSGA_TimeRewind::ActivateAbility(
         return;
     }
 
-    ACSCharacterPlayer* PlayerCharacter = Cast<ACSCharacterPlayer>(AvatarActor);
-    if (!PlayerCharacter || PlayerCharacter->TransformHistory.Num() < 99)
+    ACharacter* PlayerCharacter = Cast<ACharacter>(AvatarActor); 
+    UCSTransformRecordComponent* TransformRecordComponent = AvatarActor->GetComponentByClass<UCSTransformRecordComponent>(); 
+
+    if (!TransformRecordComponent || TransformRecordComponent->GetTransformHistory().Num() < 99)
     {
         UE_LOG(LogTemp, Warning, TEXT("Not enough Transform History Available"));
         EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
         return;
     }
+
 
     // 입력 비활성화
     if (PlayerCharacter->GetController())
@@ -74,9 +78,9 @@ void UCSGA_TimeRewind::ActivateAbility(
 
     // Ability Task 생성 (0.5초 동안 되감기)
     TArray<FCSF_CharacterFrameData> RewindFrames;
-    for (int32 i = PlayerCharacter->TransformHistory.Num() - 99; i < PlayerCharacter->TransformHistory.Num(); i++)
+    for (int32 i = TransformRecordComponent->GetTransformHistory().Num() - 99; i < TransformRecordComponent->GetTransformHistory().Num(); i++)
     {
-        RewindFrames.Add(PlayerCharacter->TransformHistory[i]);
+        RewindFrames.Add(TransformRecordComponent->GetTransformHistory()[i]);
     }
 
     UCSAT_TimeRewind* TimeRewindTask = UCSAT_TimeRewind::CreateTimeRewindTask(
@@ -88,6 +92,11 @@ void UCSGA_TimeRewind::ActivateAbility(
 
     TimeRewindTask->OnTimeRewindFinished.AddDynamic(this, &UCSGA_TimeRewind::OnTimeRewindFinishedDelegate);
     TimeRewindTask->ReadyForActivation();
+}
+
+void UCSGA_TimeRewind::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+
 }
 
 void UCSGA_TimeRewind::OnTimeRewindFinishedDelegate()
@@ -112,8 +121,6 @@ void UCSGA_TimeRewind::OnTimeRewindFinishedDelegate()
         MovementComp->GravityScale = 1.0f;
         UE_LOG(LogTemp, Log, TEXT("Gravity re-enabled after Time Rewind."));
     }
-
-
 
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
