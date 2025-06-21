@@ -67,9 +67,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AbilityPreviewAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction> InteractAction;
-
 // ASC Section
 protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
@@ -104,16 +101,6 @@ protected:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<class UCSPlayerInteractionComponent> InteractionComponent;
-
-	//FInteractionDelegate OnInteract;
-
-	UFUNCTION(Server, Reliable)
-	void ServerInteract();
-
-	void Interact();
-	void EndInteract();
-
-	bool bIsInteracted;
 
 // Character Scaling 
 

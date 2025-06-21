@@ -33,8 +33,6 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 {
 	bReplicates = true;
 
-	bIsInteracted = false;
-
 	// Camera
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -81,45 +79,20 @@ ACSCharacterPlayer::ACSCharacterPlayer()
 	Trigger->SetupAttachment(GetCapsuleComponent());
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
+	// 캐릭터에 컴포넌트 추가
+
 	PushingCharacterComponent = CreateDefaultSubobject<UCSPushingCharacterComponent>(TEXT("PushingCharacterComponent"));
 	PushingCharacterComponent->SetTrigger(Trigger);
 
 	InteractionComponent = CreateDefaultSubobject<UCSPlayerInteractionComponent>(TEXT("InteractionComponent"));
 	InteractionComponent->SetTrigger(Trigger);
 
-	// 캐릭터에 컴포넌트 추가
 	ScaleComponent = CreateDefaultSubobject<UCSCharacterScaleComponent>(TEXT("ScaleComponent"));
 	
 	GASManagerComponent = CreateDefaultSubobject<UCSGASManagerComponent>(TEXT("GASManagerComponent"));
 
 	TransformRecordComponent = CreateDefaultSubobject<UCSTransformRecordComponent>(TEXT("TransformRecordComponent"));
 }
-
-void ACSCharacterPlayer::ServerInteract_Implementation()
-{
-	InteractionComponent->ExecInteraction();
-}
-
-void ACSCharacterPlayer::Interact()
-{
-	if (bIsInteracted) return;
-
-	if ( HasAuthority() )
-	{
-		InteractionComponent->ExecInteraction();
-	}
-	else
-	{
-		ServerInteract();
-	}
-	bIsInteracted = true;
-}
-
-void ACSCharacterPlayer::EndInteract()
-{
-	bIsInteracted = false;
-}
-
 
 UAbilitySystemComponent* ACSCharacterPlayer::GetAbilitySystemComponent() const
 {
@@ -147,10 +120,8 @@ void ACSCharacterPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(ShoulderMoveAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderMove);
 	EnhancedInputComponent->BindAction(ShoulderLookAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::ShoulderLook);
 
-	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ACSCharacterPlayer::Interact);
-	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ACSCharacterPlayer::EndInteract);
-
 	GASManagerComponent->SetupGASInputComponent(Cast<UEnhancedInputComponent>(PlayerInputComponent));
+	InteractionComponent->SetInteractionInputComponent(Cast<UEnhancedInputComponent>(PlayerInputComponent));
 }
 
 void ACSCharacterPlayer::OnRep_PlayerState()

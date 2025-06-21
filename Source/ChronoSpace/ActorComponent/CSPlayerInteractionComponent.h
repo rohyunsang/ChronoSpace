@@ -16,11 +16,21 @@ public:
 	UCSPlayerInteractionComponent();
 
 	void SetTrigger(class UCapsuleComponent* InTrigger);
-
-	void ExecInteraction();
+	void SetInteractionInputComponent(class UEnhancedInputComponent* InputComponent);
 
 protected:
 	virtual void BeginPlay() override;
+
+protected:
+	void InteractionInputPressed();
+
+	UFUNCTION(Server, Reliable)
+	void ServerInteractionInputPressed();
+
+	void HandleInteractionInputPressed();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> InteractAction;
 
 private:
 	UFUNCTION()
