@@ -25,19 +25,37 @@ public:
 	void SetActive(bool bActive);
 
 protected:
+	virtual void BeginPlay() override;
+
+// Trigger
+protected:
 	UPROPERTY(VisibleAnywhere, Category = "Trigger", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USphereComponent> SphereTrigger;
 
+// Mesh
+protected:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
+	TSoftObjectPtr<class UStaticMesh> StaticMesh;
+
+
+// Interaction
+protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UWidgetComponent> InteractionPromptComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
+	TSoftClassPtr<UUserWidget> InteractionPromptWidgetClass;
+
+
+protected:
 	UFUNCTION()
 	void OnRep_bIsActive();
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trigger")
 	float TriggerRange = 80.0f;
 };
