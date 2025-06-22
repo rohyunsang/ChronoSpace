@@ -18,11 +18,17 @@ public:
 	ACSGravityCoreSphere();
 
 protected:
+	virtual void BeginPlay() override;
+
+protected:
 	UPROPERTY(VisibleAnywhere, Category = "Sphere", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USphereComponent> SphereTrigger;
 
 	UPROPERTY(VisibleAnywhere, Category = "Sphere", Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sphere")
+	TSoftObjectPtr<class UStaticMesh> StaticMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Sphere")
 	float GravityInfluenceRange = 400.0f;
